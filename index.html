@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#FFF3D6">
+<meta property="og:title" content="节奏小奶蛙">
+<meta property="og:description" content="跟着节拍，和小奶蛙一起玩遍 60 个音乐关卡！">
+<meta property="og:image" content="assets/character/frog-original.jpg">
+<title>节奏小奶蛙</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+<button id="pauseBtn" class="hidden" aria-label="暂停">⏸</button>
+
+<div id="screens">
+  <!-- 启动遮罩（音频解锁） -->
+  <div class="screen active" id="scr-boot">
+    <div class="boot-box">
+      <div class="boot-logo">节奏小奶蛙</div>
+      <div class="boot-sub">RHYTHM MILK FROG</div>
+      <div class="boot-tap">♪ 点击任意位置开始 ♪</div>
+      <div class="boot-tip">建议佩戴耳机 · 获得最佳节奏体验</div>
+    </div>
+  </div>
+
+  <!-- 标题 -->
+  <div class="screen" id="scr-title">
+    <div class="title-wrap">
+      <img class="title-photo" src="assets/character/frog-original.jpg" alt="小奶蛙">
+      <div class="title-logo">节奏小奶蛙</div>
+      <div class="title-sub">和奶蛙一起，踩准每一个节拍</div>
+      <div class="title-btns">
+        <button class="btn btn-big" id="btn-start">开始游戏</button>
+        <button class="btn" id="btn-select">选择关卡</button>
+        <button class="btn" id="btn-settings">设 置</button>
+      </div>
+      <div class="title-foot">v26.10.27b · 第一阶段 · 运动季 已开放</div>
+    </div>
+  </div>
+
+  <!-- 选关 -->
+  <div class="screen" id="scr-select">
+    <div class="select-wrap">
+      <div class="select-top">
+        <button class="btn btn-back" id="btn-select-back">‹ 返回</button>
+        <div class="select-title">选择关卡</div>
+        <div class="select-score" id="select-total"></div>
+      </div>
+      <div class="stage-tabs" id="stage-tabs"></div>
+      <div class="level-grid" id="level-grid"></div>
+    </div>
+  </div>
+
+  <!-- 结算 -->
+  <div class="screen" id="scr-result">
+    <div class="result-wrap">
+      <div class="result-rank" id="result-rank">S</div>
+      <div class="result-title" id="result-title">关卡完成！</div>
+      <div class="result-rows" id="result-rows"></div>
+      <div class="result-score" id="result-score"></div>
+      <div class="result-btns">
+        <button class="btn" id="btn-retry">重 试</button>
+        <button class="btn btn-big" id="btn-next">下一关 ›</button>
+        <button class="btn" id="btn-result-select">选 关</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 阶段庆祝 -->
+  <div class="screen" id="scr-celebration">
+    <div class="cele-wrap">
+      <div class="cele-emoji">🎉</div>
+      <div class="cele-title" id="cele-title">第一阶段完成！</div>
+      <div class="cele-sub" id="cele-sub"></div>
+      <div class="cele-stars" id="cele-stars"></div>
+      <div class="cele-btns">
+        <button class="btn btn-big" id="btn-cele-continue">继续冒险</button>
+        <button class="btn" id="btn-cele-select">返回选关</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设置 -->
+  <div class="screen" id="scr-settings">
+    <div class="settings-wrap">
+      <div class="settings-title">设 置</div>
+      <div class="set-row"><span>背景音乐</span><input type="range" id="set-bgm" min="0" max="100" value="80"></div>
+      <div class="set-row"><span>音效</span><input type="range" id="set-sfx" min="0" max="100" value="90"></div>
+      <div class="set-row"><span>震动反馈</span><label class="switch"><input type="checkbox" id="set-vib" checked><i></i></label></div>
+      <div class="set-tip">震动在部分手机浏览器上不可用时将自动关闭</div>
+      <button class="btn btn-big" id="btn-settings-close">关 闭</button>
+    </div>
+  </div>
+
+  <!-- 暂停 -->
+  <div class="screen" id="scr-pause">
+    <div class="pause-wrap">
+      <div class="pause-title">暂 停</div>
+      <button class="btn btn-big" id="btn-resume">继续游戏</button>
+      <button class="btn" id="btn-restart">重新开始</button>
+      <button class="btn" id="btn-quit">退出关卡</button>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden"></div>
+</div>
+
+<script src="js/core/util.js"></script>
+<script src="js/core/view.js"></script>
+<script src="js/core/input.js"></script>
+<script src="js/systems/save.js"></script>
+<script src="js/core/audio.js"></script>
+<script src="js/core/sfx.js"></script>
+<script src="js/core/music.js"></script>
+<script src="js/systems/judge.js"></script>
+<script src="js/systems/chart.js"></script>
+<script src="js/systems/scoring.js"></script>
+<script src="js/systems/fx.js"></script>
+<script src="js/systems/hud.js"></script>
+<script src="js/art/frog.js"></script>
+<script src="js/art/props.js"></script>
+<script src="js/art/themes.js"></script>
+<script src="js/levels/mechanics.js"></script>
+<script src="js/levels/stage1.js"></script>
+<script src="js/levels/registry.js"></script>
+<script src="js/levels/tutorial.js"></script>
+<script src="js/game/play.js"></script>
+<script src="js/ui/screens.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
