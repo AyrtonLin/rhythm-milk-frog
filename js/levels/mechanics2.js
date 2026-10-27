@@ -734,11 +734,12 @@
       /* 分类站台面 + 标牌 */
       ctx.fillStyle = 'rgba(141,110,99,0.6)';
       U.roundRect(ctx, w * 0.1, h * 0.72, w * 0.8, 10 * u, 4 * u); ctx.fill();
-      ctx.fillStyle = '#FFFDF4'; U.roundRect(ctx, w * 0.32, h * 0.1, w * 0.36, h * 0.07, 8 * u); ctx.fill();
-      ctx.strokeStyle = '#8D6E63'; ctx.lineWidth = 2.5 * u; U.roundRect(ctx, w * 0.32, h * 0.1, w * 0.36, h * 0.07, 8 * u); ctx.stroke();
-      ctx.fillStyle = '#6b4a12'; ctx.font = '800 ' + 14 * u + 'px system-ui,sans-serif';
+      /* 分类站标牌（下移避免遮挡对照表） */
+      ctx.fillStyle = '#FFFDF4'; U.roundRect(ctx, w * 0.36, h * 0.5, w * 0.28, h * 0.055, 8 * u); ctx.fill();
+      ctx.strokeStyle = '#8D6E63'; ctx.lineWidth = 2.5 * u; U.roundRect(ctx, w * 0.36, h * 0.5, w * 0.28, h * 0.055, 8 * u); ctx.stroke();
+      ctx.fillStyle = '#6b4a12'; ctx.font = '800 ' + 13 * u + 'px system-ui,sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('垃圾分类站', w / 2, h * 0.135);
+      ctx.fillText('垃圾分类站', w / 2, h * 0.5275);
       /* 四桶 */
       for (let i = 0; i < 4; i++) {
         const b = this.BINS[i], x = this.binX(i), y = h * 0.66;

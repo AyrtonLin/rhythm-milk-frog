@@ -13,6 +13,6 @@
   L(6, '买菜', 112, 'target', { kind: 'veg', prop: 'basket' }, { tip: '点击新鲜菜篮子，别碰烂菜' });
   L(7, '接住阿姨的菜', 116, 'fall', { kind: 'veg', prop: 'basket' }, { tip: '菜落到接菜线时点击对应轨道' });
   L(8, '浇花', 120, 'target', { kind: 'water', prop: 'can' }, { tip: '花快枯了！踩拍点击花盆浇水' });
-  L(9, '垃圾分类', 124, 'choice', { judgeScale: 1.3, cueWinBeats: 4 }, { tip: '看清物品与背景对照表，踩拍点击正确垃圾桶' });
+  L(9, '垃圾分类', 124, 'choice', { judgeScale: 1.3, cueWinBeats: 6 }, { tip: '看清物品与背景对照表，踩拍点击正确垃圾桶' });
   L(10, '取快递', 128, 'fall', { kind: 'parcel' }, { tip: '快递从格口落下，踩拍点击轨道接住' });
 })();
