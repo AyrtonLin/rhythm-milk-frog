@@ -689,8 +689,36 @@
     draw(r, ctx) {
       const w = RF.view.w, h = RF.view.h, u = RF.view.u, now = r.now();
       ctx.save();
-      /* 物品卡 */
       const n = r.chart.notes.find(nn => !nn.judged && nn.t - now < 2.6 && nn.t - now > -0.2);
+      /* 背景对照表：物品 → 垃圾桶（当前物品金框高亮） */
+      const fs = Math.max(10, 9.5 * u);
+      ctx.fillStyle = 'rgba(255,253,244,0.6)';
+      U.roundRect(ctx, w * 0.03, h * 0.075, w * 0.94, h * 0.155, 10 * u); ctx.fill();
+      ctx.strokeStyle = 'rgba(139,110,99,0.5)'; ctx.lineWidth = 2 * u;
+      U.roundRect(ctx, w * 0.03, h * 0.075, w * 0.94, h * 0.155, 10 * u); ctx.stroke();
+      const actItem = n ? n.item % 8 : -1;
+      for (let i = 0; i < 8; i++) {
+        const col = i % 2, row = Math.floor(i / 2);
+        const cx0 = w * 0.05 + col * w * 0.47;
+        const cy0 = h * 0.093 + row * h * 0.036;
+        const it = this.ITEMS[i], bin = this.BINS[it[2]];
+        if (i === actItem) {
+          ctx.strokeStyle = '#FFB300'; ctx.lineWidth = 3 * u;
+          U.roundRect(ctx, cx0 - 6 * u, cy0 - h * 0.017, w * 0.44, h * 0.034, 6 * u); ctx.stroke();
+          ctx.fillStyle = 'rgba(255,211,77,0.25)';
+          U.roundRect(ctx, cx0 - 6 * u, cy0 - h * 0.017, w * 0.44, h * 0.034, 6 * u); ctx.fill();
+        }
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.font = (fs + 2) + 'px system-ui,sans-serif';
+        ctx.fillText(it[1], cx0, cy0);
+        ctx.font = '700 ' + fs + 'px system-ui,sans-serif'; ctx.fillStyle = '#5D4037';
+        ctx.fillText(it[0], cx0 + fs + 6 * u, cy0);
+        ctx.fillStyle = bin[1];
+        U.circle(ctx, cx0 + w * 0.24, cy0, 5 * u); ctx.fill();
+        ctx.font = '700 ' + fs + 'px system-ui,sans-serif'; ctx.fillStyle = '#5D4037';
+        ctx.fillText(bin[0], cx0 + w * 0.24 + 8 * u, cy0);
+      }
+      /* 物品卡 */
       if (n) {
         const it = this.ITEMS[n.item % 8];
         ctx.fillStyle = 'rgba(255,253,244,0.95)';
