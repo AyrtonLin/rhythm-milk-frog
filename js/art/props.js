@@ -207,6 +207,81 @@
     U.circle(ctx, -6 * s, -20 * s, 1.8 * s); ctx.fill();
     U.circle(ctx, 5 * s, -22 * s, 1.8 * s); ctx.fill();
   };
+  /* ---- 乐器 ---- */
+  P.guitar = (ctx, s) => {
+    ctx.fillStyle = '#8D6E63';
+    U.circle(ctx, 0, -8 * s, 10 * s); ctx.fill();
+    U.circle(ctx, 0, -22 * s, 7 * s); ctx.fill();
+    ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 3 * s;
+    ctx.beginPath(); ctx.moveTo(0, -28 * s); ctx.lineTo(0, -44 * s); ctx.stroke();
+    ctx.strokeStyle = '#FFF9C4'; ctx.lineWidth = 0.8 * s;
+    ctx.beginPath(); ctx.moveTo(0, -4 * s); ctx.lineTo(0, -44 * s); ctx.stroke();
+  };
+  P.violin = (ctx, s) => {
+    ctx.fillStyle = '#A1887F';
+    U.ell(ctx, 0, -10 * s, 8 * s, 12 * s); ctx.fill();
+    ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 2.4 * s;
+    ctx.beginPath(); ctx.moveTo(0, -20 * s); ctx.lineTo(6 * s, -40 * s); ctx.stroke();
+    ctx.strokeStyle = '#FFF9C4'; ctx.lineWidth = 0.8 * s;
+    ctx.beginPath(); ctx.moveTo(-2 * s, -4 * s); ctx.lineTo(4 * s, -38 * s); ctx.stroke();
+  };
+  P.flute = (ctx, s) => {
+    ctx.strokeStyle = '#FFD34D'; ctx.lineWidth = 5 * s; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-16 * s, -10 * s); ctx.lineTo(16 * s, -14 * s); ctx.stroke();
+    ctx.fillStyle = '#5D4037';
+    for (let i = 0; i < 4; i++) U.circle(ctx, (-8 + i * 6) * s, (-11 - i * 0.8) * s, 1.4 * s), ctx.fill();
+  };
+  P.mallet = (ctx, s) => {
+    ctx.strokeStyle = '#8D6E63'; ctx.lineWidth = 3 * s;
+    ctx.beginPath(); ctx.moveTo(0, 2 * s); ctx.lineTo(0, -24 * s); ctx.stroke();
+    ctx.fillStyle = '#B0BEC5'; U.circle(ctx, 0, -28 * s, 6 * s); ctx.fill();
+  };
+  P.sticks = (ctx, s) => {
+    ctx.strokeStyle = '#D7A86E'; ctx.lineWidth = 3 * s; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-4 * s, 2 * s); ctx.lineTo(-10 * s, -26 * s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(4 * s, 2 * s); ctx.lineTo(10 * s, -26 * s); ctx.stroke();
+  };
+  P.trumpet = (ctx, s) => {
+    ctx.strokeStyle = '#FFD34D'; ctx.lineWidth = 4 * s;
+    ctx.beginPath(); ctx.moveTo(-12 * s, -12 * s); ctx.lineTo(12 * s, -12 * s); ctx.stroke();
+    ctx.fillStyle = '#FFD34D';
+    ctx.beginPath(); ctx.moveTo(12 * s, -12 * s); ctx.lineTo(20 * s, -18 * s); ctx.lineTo(20 * s, -6 * s); ctx.closePath(); ctx.fill();
+    for (let i = 0; i < 3; i++) { U.circle(ctx, (-6 + i * 6) * s, -16 * s, 2 * s); ctx.fill(); }
+  };
+  P.erhu = (ctx, s) => {
+    ctx.fillStyle = '#8D6E63'; U.roundRect(ctx, -6 * s, -12 * s, 12 * s, 14 * s, 3 * s); ctx.fill();
+    ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 2.4 * s;
+    ctx.beginPath(); ctx.moveTo(0, -12 * s); ctx.lineTo(0, -40 * s); ctx.stroke();
+    ctx.strokeStyle = '#FFF9C4'; ctx.lineWidth = 0.8 * s;
+    ctx.beginPath(); ctx.moveTo(0, -2 * s); ctx.lineTo(0, -40 * s); ctx.stroke();
+  };
+  P.harmonica = (ctx, s) => {
+    ctx.fillStyle = '#B0BEC5'; U.roundRect(ctx, -14 * s, -14 * s, 28 * s, 8 * s, 3 * s); ctx.fill();
+    ctx.fillStyle = '#546E7A';
+    for (let i = 0; i < 6; i++) U.circle(ctx, (-10 + i * 4) * s, -10 * s, 1.2 * s), ctx.fill();
+  };
+  /* ---- 办公/生活物件 ---- */
+  P.phone = (ctx, s) => {
+    ctx.fillStyle = '#263238'; U.roundRect(ctx, -8 * s, -18 * s, 16 * s, 26 * s, 3 * s); ctx.fill();
+    ctx.fillStyle = '#4FC3F7'; U.roundRect(ctx, -6 * s, -16 * s, 12 * s, 20 * s, 2 * s); ctx.fill();
+  };
+  P.laptop = (ctx, s) => {
+    ctx.fillStyle = '#37474F'; U.roundRect(ctx, -14 * s, -18 * s, 28 * s, 18 * s, 2 * s); ctx.fill();
+    ctx.fillStyle = '#81D4FA'; U.roundRect(ctx, -12 * s, -16 * s, 24 * s, 14 * s, 1.5 * s); ctx.fill();
+    ctx.fillStyle = '#546E7A'; U.roundRect(ctx, -16 * s, 0, 32 * s, 4 * s, 2 * s); ctx.fill();
+  };
+  P.tablet = (ctx, s) => {
+    ctx.fillStyle = '#263238'; U.roundRect(ctx, -12 * s, -16 * s, 24 * s, 30 * s, 3 * s); ctx.fill();
+    ctx.fillStyle = '#A5D6A7'; U.roundRect(ctx, -10 * s, -14 * s, 20 * s, 26 * s, 2 * s); ctx.fill();
+  };
+  P.handset = (ctx, s) => {
+    ctx.fillStyle = '#EF5350'; U.roundRect(ctx, -12 * s, -10 * s, 24 * s, 16 * s, 4 * s); ctx.fill();
+    ctx.fillStyle = '#FFFDF4';
+    U.circle(ctx, -6 * s, -2 * s, 2.4 * s); ctx.fill();
+    U.circle(ctx, 0, -2 * s, 2.4 * s); ctx.fill();
+    U.circle(ctx, 6 * s, -2 * s, 2.4 * s); ctx.fill();
+    ctx.fillStyle = '#263238'; U.roundRect(ctx, -10 * s, -16 * s, 20 * s, 5 * s, 2 * s); ctx.fill();
+  };
   /* 场景物件 */
   P.hoop = (ctx, s) => {      // 篮框（原点=框中心）
     ctx.strokeStyle = '#ECEFF1'; ctx.lineWidth = 5 * s;
