@@ -77,6 +77,8 @@
   A.play = function (song) {
     if (!A.ctx) return;
     A.stop();
+    /* 修复：暂停/退出遗留的 suspended 时钟必须恢复，否则新关卡停摆 */
+    if (A.ctx.state === 'suspended') A.ctx.resume();
     A._st = { song, i: 0, t0: A.ctx.currentTime + 0.15 };
     A._timer = setInterval(A._tick, 25);
   };

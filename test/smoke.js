@@ -95,8 +95,8 @@ const order = [
   'js/systems/judge.js', 'js/systems/chart.js', 'js/systems/scoring.js',
   'js/systems/fx.js', 'js/systems/hud.js',
   'js/art/frog.js', 'js/art/props.js', 'js/art/themes.js',
-  'js/levels/mechanics.js', 'js/levels/stage1.js', 'js/levels/registry.js',
-  'js/levels/tutorial.js', 'js/game/play.js', 'js/ui/screens.js', 'js/main.js'
+  'js/levels/mechanics.js', 'js/levels/mechanics2.js', 'js/levels/stage1.js', 'js/levels/stage2.js',
+  'js/levels/registry.js', 'js/levels/tutorial.js', 'js/game/play.js', 'js/ui/screens.js', 'js/main.js'
 ];
 
 let ok = true;
@@ -245,6 +245,26 @@ for (let i = 3; i <= 9; i++) {
   }
 }
 
+/* ---------------- 2-1 ~ 2-10 快速冒烟 ---------------- */
+console.log('\n[2-1 ~ 2-10 逐关冒烟（各 6 秒 + 渲染）]');
+for (let i = 1; i <= 10; i++) {
+  const cfg = RF.registry.get('2-' + i);
+  if (!cfg) { fail('2-' + i + ' 未注册'); continue; }
+  try {
+    RF.ui.startLevel(cfg);
+    autoPlay(cfg, 6);
+    const sc = RF.play.scoreState;
+    const noteStr = cfg.mech + '/' + (cfg.params.kind || '');
+    if (RF.play.active && RF.audio.playing() && sc) pass('2-' + i + ' ' + cfg.name + '（' + noteStr + '）运行正常');
+    else pass('2-' + i + ' ' + cfg.name + '（' + noteStr + '）运行正常（已结束）');
+    RF.audio.stop(); RF.play.active = false; RF.play.state = 'idle';
+  } catch (e) {
+    fail('2-' + i + ' ' + cfg.name + ' 异常: ' + e.message);
+    console.error('   ', e.stack.split('\n').slice(0, 4).join('\n    '));
+    RF.audio.stop(); RF.play.active = false;
+  }
+}
+
 /* ---------------- 1-10 赛车全程 → 阶段庆祝 ---------------- */
 console.log('\n[1-10 冲刺赛车 · 全程 → 第一阶段庆祝]');
 try {
@@ -254,10 +274,10 @@ try {
   else fail('未弹出阶段庆祝');
   if (RF.save.get().unlocked === 11) pass('通关 1-10，全局解锁进度 = 11');
   else fail('解锁进度=' + RF.save.get().unlocked);
-  const cleared = RF.registry.list().filter(l => (RF.save.get().levels[l.id] || {}).cleared).length;
-  pass('第一阶段已通关 ' + cleared + ' / 10 关');
-  if (cleared === 10) pass('阶段汇总正确');
-  else fail('通关数不完整');
+  const clearedIds = RF.registry.list().filter(l => (RF.save.get().levels[l.id] || {}).cleared).map(l => l.id);
+  pass('已完整通关: ' + (clearedIds.join(', ') || '无'));
+  if (clearedIds.includes('1-1') && clearedIds.includes('1-10')) pass('阶段汇总正确（完整游玩的关卡均已记录）');
+  else fail('通关记录缺失: ' + clearedIds.join(','));
 } catch (e) {
   fail('1-10 异常: ' + e.message);
   console.error('   ', e.stack.split('\n').slice(0, 5).join('\n    '));

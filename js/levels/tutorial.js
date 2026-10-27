@@ -11,7 +11,7 @@
     t.pulse += dt;
     t.flash = Math.max(0, t.flash - dt * 3);
     if (t.pulse > 0.8) { t.pulse = 0; if (t.step === 0) RF.sfx.charge(0.3); }
-    if (t.charging) {
+    if (t.charging != null) {
       t.power = Math.min(100, (performance.now() - t.charging) / (RF.chart.FULL * 1000) * 100);
       r.frog.charge = t.power / 100;
       r.setPose('charge', 0.1);
@@ -25,7 +25,7 @@
   T.down = function (r, e) {
     const t = r.tut;
     if (t.step === 3) { T.finish(r); return; }
-    if (!t.charging) t.charging = performance.now();
+    if (t.charging == null) t.charging = performance.now();
     if (t.step === 0) {
       t.taps++;
       RF.sfx.pop();
@@ -36,7 +36,7 @@
   };
   T.up = function (r, e) {
     const t = r.tut;
-    if (!t.charging) return;
+    if (t.charging == null) return;
     const hold = (performance.now() - t.charging) / 1000;
     const power = t.power;
     t.charging = null;

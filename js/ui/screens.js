@@ -59,6 +59,7 @@
     $('btn-quit').onclick = () => {
       RF.sfx.ui();
       RF.audio.stop();
+      RF.audio.resume();          // 恢复时钟，避免下一关停摆/菜单静音
       RF.play.active = false; RF.play.state = 'idle';
       UI.showPauseBtn(false);
       UI.renderSelect(); UI.showScreen('scr-select');
