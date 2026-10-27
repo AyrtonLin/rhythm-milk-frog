@@ -12,15 +12,21 @@
   C.make = function (cfg) {
     const r = RF.util.mulberry32(RF.util.hashStr(cfg.id));
     const beatSec = 60 / cfg.bpm;
-    const total = cfg.beats;
+    let total = cfg.beats;
     const intro = 4, outro = 4;
     const usable = total - intro - outro;
-    const count = Math.min(COUNTS[(cfg.levelIdx - 1) % 10] || 30, Math.floor(usable / 0.5));
+    let count = Math.min(COUNTS[(cfg.levelIdx - 1) % 10] || 30, Math.floor(usable / 0.5));
     const notes = [];
     /* 以基础间隔铺点，再按种子做 ±0.5 拍微扰（保持网格对齐） */
-    const base = Math.max(0.5, Math.round((usable / count) * 2) / 2);
+    let base = Math.max(0.5, Math.round((usable / count) * 2) / 2);
+    if (cfg.mech === 'power') {
+      /* 蓄力关：按关卡定音符数与间隔，含波间倒计时总时长 ≈ 1 分钟 */
+      const li = (cfg.levelIdx - 1) % 10;
+      count = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30][li];
+      base = [6, 5.5, 5, 4.5, 4, 4, 3.5, 3.5, 3, 3][li];
+    }
     let t = intro, i = 0;
-    while (t <= total - outro && i < count + 6) {
+    while (t <= total - outro && i < count + (cfg.mech === 'power' ? 1 : 6)) {
       notes.push({ i: i, beat: t, t: t * beatSec, judged: false, tier: null });
       let gap = base;
       const roll = r();
@@ -29,6 +35,19 @@
       else if (base <= 1.5 && roll > 0.9) gap = base + 0.5;
       t = Math.round((t + Math.max(0.5, gap)) * 2) / 2;
       i++;
+    }
+    /* 蓄力关：开局倒计时 + 每 10 音符一波、波间 4 秒（3 秒倒计时 + 1 秒提示缓冲） */
+    let waveStarts = null;
+    if (cfg.mech === 'power') {
+      const WAVE = 10;
+      const GAPB = 4 / beatSec;
+      const baseOff = Math.max(0.5, (4 - intro * beatSec) / beatSec);
+      notes.forEach((n, k) => {
+        const wv = Math.floor(k / WAVE);
+        n.beat += baseOff + wv * GAPB;
+        n.t = n.beat * beatSec;
+      });
+      total = Math.ceil(notes[notes.length - 1].beat) + 4;
     }
     /* 机制附加字段 */
     const zoneCenters = [35, 55, 72, 88];
@@ -64,9 +83,16 @@
     /* 满分模拟：全 Perfect 连击加成 */
     let combo = 0, maxScore = 0;
     notes.forEach(() => { combo++; maxScore += 300 * C.comboMult(combo); });
+    /* 蓄力关：倒计时终点 = 每波首个“按住!”提示出现时刻 */
+    if (cfg.mech === 'power') {
+      waveStarts = [];
+      for (let k = 0; k < notes.length; k += 10) {
+        waveStarts.push(Math.max(0.2, notes[k].t - notes[k].zone.c / 100 * C.FULL));
+      }
+    }
     return {
       notes, beatSec, duration: total * beatSec, totalBeats: total, maxScore,
-      count: notes.length
+      count: notes.length, waveStarts
     };
   };
   C.comboMult = combo => 1 + Math.min(0.5, Math.floor(combo / 10) * 0.05);
