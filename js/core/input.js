@@ -39,10 +39,17 @@
   window.addEventListener('pointercancel', ev => release(ev, true));
   window.addEventListener('contextmenu', ev => { if (isCanvas(ev)) ev.preventDefault(); });
 
-  /* 键盘：空格/回车 = 点击与长按；W A S D / 方向键 = 上下左右（方向类关卡通用） */
+  /* 键盘：空格/回车 = 点击与长按；W A S D / 方向键 = 上下左右（方向类关卡通用）；A S D F G H J K = 音游轨道 */
   const DIRK = { KeyW: 'U', ArrowUp: 'U', KeyS: 'D', ArrowDown: 'D', KeyA: 'L', ArrowLeft: 'L', KeyD: 'R', ArrowRight: 'R' };
+  const LANEK = { KeyA: 0, KeyS: 1, KeyD: 2, KeyF: 3, KeyG: 4, KeyH: 5, KeyJ: 6, KeyK: 7 };
   let kbT = 0;
   window.addEventListener('keydown', ev => {
+    const ln = LANEK[ev.code];
+    if (ln != null) {
+      if (!ev.repeat) emit({ type: 'down', id: 'kl' + ln, lane: ln, x: RF.view.w / 2, y: RF.view.h / 2 });
+      if (ev.code !== 'KeyA' && ev.code !== 'KeyS' && ev.code !== 'KeyD') return;  // 与 WASD 共存时继续发方向
+      if (ev.repeat) return;
+    }
     const d = DIRK[ev.code];
     if (d) {
       ev.preventDefault();
@@ -57,6 +64,11 @@
     }
   });
   window.addEventListener('keyup', ev => {
+    const ln = LANEK[ev.code];
+    if (ln != null) {
+      emit({ type: 'up', id: 'kl' + ln, lane: ln, x: RF.view.w / 2, y: RF.view.h / 2, hold: 0 });
+      if (ev.code !== 'KeyA' && ev.code !== 'KeyS' && ev.code !== 'KeyD') return;
+    }
     const d = DIRK[ev.code];
     if (d) {
       emit({ type: 'up', id: 'kb_' + d, dir: d, x: RF.view.w / 2, y: RF.view.h / 2, hold: 0 });
