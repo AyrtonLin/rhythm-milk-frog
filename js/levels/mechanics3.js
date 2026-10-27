@@ -24,6 +24,7 @@
     laneY(r, i) {
       const h = RF.view.h;
       if (r.m.skin === 'drums') return h * [0.68, 0.56, 0.44, 0.6, 0.5][i % 5];
+      if (r.m.skin === 'stairs') return h * 0.72 - i * h * 0.07;
       return h * 0.72;
     },
     lineY(r) { return RF.view.h * 0.72; },
@@ -77,7 +78,9 @@
         ctx.fillRect(x - lw / 2 + 2, h * 0.12, lw - 4, y - h * 0.12);
       }
       /* ---- 完整乐器画面 ---- */
-      if (m.skin === 'piano') {
+      const kp = RF.scenes && RF.scenes['keys_' + m.skin];
+      if (kp) { kp(ctx, r); }
+      else if (m.skin === 'piano') {
         const ly = this.lineY(r);
         /* 琴身 */
         ctx.fillStyle = '#263238';
