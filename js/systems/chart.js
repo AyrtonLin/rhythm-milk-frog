@@ -68,12 +68,15 @@
       } else if (cfg.mech === 'target') {
         n.px = U.rr(r, 0.2, 0.8); n.py = U.rr(r, 0.3, 0.58);
         n.ph = U.rr(r, 0, 6.28); n.side = r() < 0.5 ? 0 : 1;
+        n.aim = Math.floor(r() * 8);
       } else if (cfg.mech === 'beattap') {
         n.px = U.rr(r, 0.25, 0.75); n.py = U.rr(r, 0.4, 0.62);
       } else if (cfg.mech === 'fall') {
         n.lane = Math.floor(r() * 3);
       } else if (cfg.mech === 'choice') {
         n.item = Math.floor(r() * 8);
+      } else if (cfg.mech === 'pose') {
+        n.item = Math.floor(r() * 4);
       } else if (cfg.mech === 'keys') {
         n.lane = Math.floor(r() * (cfg.params.lanes || 4));
       } else if (cfg.mech === 'tri') {
