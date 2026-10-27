@@ -260,27 +260,110 @@
     ctx.fillStyle = '#546E7A';
     for (let i = 0; i < 6; i++) U.circle(ctx, (-10 + i * 4) * s, -10 * s, 1.2 * s), ctx.fill();
   };
+  P.plane = (ctx, s) => {   // 纸飞机
+    ctx.fillStyle = '#FFFDF4';
+    ctx.beginPath(); ctx.moveTo(14 * s, 0); ctx.lineTo(-12 * s, -8 * s); ctx.lineTo(-6 * s, 0); ctx.lineTo(-12 * s, 8 * s); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#B0BEC5'; ctx.lineWidth = 1.2 * s;
+    ctx.beginPath(); ctx.moveTo(14 * s, 0); ctx.lineTo(-6 * s, 0); ctx.stroke();
+  };
+  P.star = (ctx, s) => {
+    ctx.fillStyle = '#FFF176';
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) { const rr = i % 2 ? 5 * s : 12 * s; const a = i / 10 * U.TAU - Math.PI / 2; ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#FBC02D'; ctx.lineWidth = 1.2 * s; ctx.stroke();
+  };
+  P.mic = (ctx, s) => {
+    ctx.fillStyle = '#37474F'; U.circle(ctx, 0, -22 * s, 7 * s); ctx.fill();
+    ctx.strokeStyle = '#546E7A'; ctx.lineWidth = 2 * s;
+    ctx.beginPath(); ctx.arc(0, -22 * s, 9 * s, 0, Math.PI); ctx.stroke();
+    ctx.strokeStyle = '#455A64'; ctx.lineWidth = 3.4 * s;
+    ctx.beginPath(); ctx.moveTo(0, -14 * s); ctx.lineTo(0, 2 * s); ctx.stroke();
+  };
   /* ---- 办公/生活物件 ---- */
   P.phone = (ctx, s) => {
-    ctx.fillStyle = '#263238'; U.roundRect(ctx, -8 * s, -18 * s, 16 * s, 26 * s, 3 * s); ctx.fill();
-    ctx.fillStyle = '#4FC3F7'; U.roundRect(ctx, -6 * s, -16 * s, 12 * s, 20 * s, 2 * s); ctx.fill();
+    /* 手机：小尺寸，金属边框+全面屏+应用图标 */
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.18)'; U.ell(ctx, 1 * s, 10 * s, 10 * s, 3 * s); ctx.fill();
+    const g = ctx.createLinearGradient(-8 * s, -20 * s, 8 * s, 8 * s);
+    g.addColorStop(0, '#455A64'); g.addColorStop(0.5, '#263238'); g.addColorStop(1, '#37474F');
+    ctx.fillStyle = g; U.roundRect(ctx, -8 * s, -20 * s, 16 * s, 28 * s, 3.5 * s); ctx.fill();
+    const sg = ctx.createLinearGradient(0, -18 * s, 0, 6 * s);
+    sg.addColorStop(0, '#4FC3F7'); sg.addColorStop(1, '#1565C0');
+    ctx.fillStyle = sg; U.roundRect(ctx, -6.6 * s, -18.4 * s, 13.2 * s, 24.4 * s, 2.2 * s); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    for (let r2 = 0; r2 < 3; r2++) for (let c = 0; c < 3; c++) { U.roundRect(ctx, (-5 + c * 3.6) * s, (-16 + r2 * 4.4) * s, 2.6 * s, 2.6 * s, 0.8 * s); ctx.fill(); }
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'; U.roundRect(ctx, -2.5 * s, 4.6 * s, 5 * s, 1 * s, 0.5 * s); ctx.fill();
+    ctx.fillStyle = '#111'; U.circle(ctx, 0, -19.2 * s, 0.8 * s); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.beginPath(); ctx.moveTo(-6.6 * s, -18.4 * s); ctx.lineTo(-1 * s, -18.4 * s); ctx.lineTo(-6.6 * s, -6 * s); ctx.closePath(); ctx.fill();
+    ctx.restore();
   };
   P.laptop = (ctx, s) => {
-    ctx.fillStyle = '#37474F'; U.roundRect(ctx, -14 * s, -18 * s, 28 * s, 18 * s, 2 * s); ctx.fill();
-    ctx.fillStyle = '#81D4FA'; U.roundRect(ctx, -12 * s, -16 * s, 24 * s, 14 * s, 1.5 * s); ctx.fill();
-    ctx.fillStyle = '#546E7A'; U.roundRect(ctx, -16 * s, 0, 32 * s, 4 * s, 2 * s); ctx.fill();
+    /* 笔电：大尺寸，开合夹角+键盘网格+触控板 */
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.2)'; U.ell(ctx, 0, 6 * s, 22 * s, 4 * s); ctx.fill();
+    const bg = ctx.createLinearGradient(0, -26 * s, 0, -2 * s);
+    bg.addColorStop(0, '#37474F'); bg.addColorStop(1, '#263238');
+    ctx.fillStyle = bg; U.roundRect(ctx, -17 * s, -26 * s, 34 * s, 24 * s, 2.5 * s); ctx.fill();
+    const sc2 = ctx.createLinearGradient(-15 * s, -24 * s, 15 * s, -4 * s);
+    sc2.addColorStop(0, '#81D4FA'); sc2.addColorStop(0.6, '#4FC3F7'); sc2.addColorStop(1, '#29B6F6');
+    ctx.fillStyle = sc2; U.roundRect(ctx, -15.4 * s, -24.4 * s, 30.8 * s, 20.8 * s, 1.5 * s); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    for (let i = 0; i < 4; i++) { U.roundRect(ctx, -13 * s, (-21 + i * 4) * s, (i % 2 ? 16 : 22) * s, 2 * s, 1 * s); ctx.fill(); }
+    ctx.fillStyle = 'rgba(255,255,255,0.9)'; U.circle(ctx, 0, -8 * s, 2.6 * s); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.beginPath(); ctx.moveTo(-15.4 * s, -24.4 * s); ctx.lineTo(-4 * s, -24.4 * s); ctx.lineTo(-15.4 * s, -8 * s); ctx.closePath(); ctx.fill();
+    const base = ctx.createLinearGradient(0, -2 * s, 0, 6 * s);
+    base.addColorStop(0, '#B0BEC5'); base.addColorStop(1, '#78909C');
+    ctx.fillStyle = base;
+    ctx.beginPath(); ctx.moveTo(-19 * s, -2 * s); ctx.lineTo(19 * s, -2 * s); ctx.lineTo(22 * s, 5 * s); ctx.lineTo(-22 * s, 5 * s); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#546E7A';
+    for (let r2 = 0; r2 < 3; r2++) for (let c = 0; c < 10; c++) { U.roundRect(ctx, (-16 + c * 3.2) * s, (-1 + r2 * 1.9) * s, 2.6 * s, 1.4 * s, 0.5 * s); ctx.fill(); }
+    ctx.fillStyle = '#90A4AE'; U.roundRect(ctx, -5 * s, 3.2 * s, 10 * s, 1.6 * s, 0.8 * s); ctx.fill();
+    ctx.restore();
   };
   P.tablet = (ctx, s) => {
-    ctx.fillStyle = '#263238'; U.roundRect(ctx, -12 * s, -16 * s, 24 * s, 30 * s, 3 * s); ctx.fill();
-    ctx.fillStyle = '#A5D6A7'; U.roundRect(ctx, -10 * s, -14 * s, 20 * s, 26 * s, 2 * s); ctx.fill();
+    /* 平板：中尺寸，横放支架+手写笔迹 */
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.18)'; U.ell(ctx, 1 * s, 12 * s, 15 * s, 3.4 * s); ctx.fill();
+    ctx.strokeStyle = '#607D8B'; ctx.lineWidth = 2.4 * s;
+    ctx.beginPath(); ctx.moveTo(8 * s, 12 * s); ctx.lineTo(14 * s, 2 * s); ctx.stroke();
+    const g = ctx.createLinearGradient(-13 * s, -18 * s, 13 * s, 10 * s);
+    g.addColorStop(0, '#455A64'); g.addColorStop(1, '#263238');
+    ctx.fillStyle = g; U.roundRect(ctx, -13 * s, -18 * s, 26 * s, 28 * s, 3 * s); ctx.fill();
+    const sg = ctx.createLinearGradient(0, -16 * s, 0, 8 * s);
+    sg.addColorStop(0, '#FFF9C4'); sg.addColorStop(1, '#FFE082');
+    ctx.fillStyle = sg; U.roundRect(ctx, -11.4 * s, -16.4 * s, 22.8 * s, 24.8 * s, 1.8 * s); ctx.fill();
+    ctx.strokeStyle = '#EF5350'; ctx.lineWidth = 1.6 * s; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-7 * s, 2 * s); ctx.quadraticCurveTo(-2 * s, -8 * s, 2 * s, -1 * s); ctx.quadraticCurveTo(5 * s, 4 * s, 8 * s, -4 * s); ctx.stroke();
+    ctx.strokeStyle = '#42A5F5';
+    ctx.beginPath(); ctx.moveTo(-7 * s, 5 * s); ctx.lineTo(6 * s, 5 * s); ctx.stroke();
+    ctx.fillStyle = '#111'; U.circle(ctx, 0, -17.2 * s, 0.8 * s); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.beginPath(); ctx.moveTo(-11.4 * s, -16.4 * s); ctx.lineTo(-2 * s, -16.4 * s); ctx.lineTo(-11.4 * s, 0); ctx.closePath(); ctx.fill();
+    ctx.restore();
   };
   P.handset = (ctx, s) => {
-    ctx.fillStyle = '#EF5350'; U.roundRect(ctx, -12 * s, -10 * s, 24 * s, 16 * s, 4 * s); ctx.fill();
+    /* 座机：底座按键阵+听筒+卷线 */
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.18)'; U.ell(ctx, 1 * s, 8 * s, 16 * s, 3.4 * s); ctx.fill();
+    const g = ctx.createLinearGradient(0, -8 * s, 0, 8 * s);
+    g.addColorStop(0, '#EF5350'); g.addColorStop(1, '#C62828');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.moveTo(-14 * s, -6 * s); ctx.lineTo(14 * s, -6 * s); ctx.lineTo(11 * s, 8 * s); ctx.lineTo(-11 * s, 8 * s); ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#FFFDF4';
-    U.circle(ctx, -6 * s, -2 * s, 2.4 * s); ctx.fill();
-    U.circle(ctx, 0, -2 * s, 2.4 * s); ctx.fill();
-    U.circle(ctx, 6 * s, -2 * s, 2.4 * s); ctx.fill();
-    ctx.fillStyle = '#263238'; U.roundRect(ctx, -10 * s, -16 * s, 20 * s, 5 * s, 2 * s); ctx.fill();
+    for (let r2 = 0; r2 < 3; r2++) for (let c = 0; c < 3; c++) { U.circle(ctx, (-6 + c * 6) * s, (-2 + r2 * 3.6) * s, 1.5 * s); ctx.fill(); }
+    ctx.fillStyle = '#B71C1C';
+    U.roundRect(ctx, -15 * s, -13 * s, 30 * s, 7 * s, 3.5 * s); ctx.fill();
+    ctx.fillStyle = '#8E1414';
+    U.circle(ctx, -12 * s, -9.5 * s, 3.4 * s); ctx.fill();
+    U.circle(ctx, 12 * s, -9.5 * s, 3.4 * s); ctx.fill();
+    ctx.strokeStyle = '#8E1414'; ctx.lineWidth = 1.4 * s;
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) ctx.arc(15 * s + i * 2 * s, 4 * s, 1.6 * s, 0, Math.PI);
+    ctx.stroke();
+    ctx.restore();
   };
   /* 场景物件 */
   P.hoop = (ctx, s) => {      // 篮框（原点=框中心）
