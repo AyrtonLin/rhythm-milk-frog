@@ -94,7 +94,11 @@
   A._schedule = function (ev, t) {
     const S = (A._st && A._st.song && A._st.song.style) || {};
     switch (ev.tr) {
-      case 'lead': A.tone({ t, f: ev.f, dur: ev.dur, vol: ev.vol, type: S.wave || 'square' }); break;
+      case 'lead': {
+        const vp = RF.music.VOICES[(A._st && A._st.song.voice)] || {};
+        A.tone({ t, f: ev.f, dur: ev.dur * (vp.durMul || 1), vol: ev.vol, type: vp.wave || S.wave || 'square', att: vp.att || 0.008 });
+        break;
+      }
       case 'bass': A.tone({ t, f: ev.f, dur: ev.dur, vol: ev.vol || 0.34, type: S.bassWave || 'triangle' }); break;
       case 'pad': A.tone({ t, f: ev.f, dur: ev.dur, vol: ev.vol || 0.08, type: 'sine', att: 0.08 }); break;
       case 'kick': drum.kick(t, ev.vol); break;

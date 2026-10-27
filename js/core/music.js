@@ -14,6 +14,19 @@
     dream: { root: 60, prog: [0, 5, 3, 7], penta: [0, 3, 5, 7, 10], wave: 'sine', bassWave: 'sine', drums: 'none', mel: 0.35, hat8: false, pad: true }
   };
 
+  /* 乐器音色配方（BGM 主音用） */
+  M.VOICES = {
+    piano: { wave: 'triangle', att: 0.005, durMul: 1.6 },
+    guitar: { wave: 'sawtooth', att: 0.004, durMul: 1.1 },
+    violin: { wave: 'sawtooth', att: 0.06, durMul: 1.8 },
+    flute: { wave: 'sine', att: 0.04, durMul: 1.6 },
+    drums: { wave: 'square', att: 0.003, durMul: 0.6 },
+    bass: { wave: 'triangle', att: 0.006, durMul: 1.3 },
+    erhu: { wave: 'sawtooth', att: 0.05, durMul: 1.7 },
+    trumpet: { wave: 'sawtooth', att: 0.02, durMul: 1.2 },
+    harmonica: { wave: 'square', att: 0.02, durMul: 1.1 },
+    tri: { wave: 'sine', att: 0.004, durMul: 1.2 }
+  };
   M.make = function (cfg) {
     const r = RF.util.mulberry32(cfg.seed);
     const S = M.STYLES[cfg.style] || M.STYLES.sport;
@@ -70,6 +83,6 @@
       push(ab, 'tick', { vol: 0.6 });
     });
     ev.sort((a, b) => a.t - b.t);
-    return { bpm: cfg.bpm, beat, events: ev, duration: bars * 4 * beat, style: S, styleName: cfg.style };
+    return { bpm: cfg.bpm, beat, events: ev, duration: bars * 4 * beat, style: S, styleName: cfg.style, voice: cfg.voice };
   };
 })();

@@ -20,6 +20,57 @@
   S.score = () => { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => T({ f, dur: 0.18, vol: 0.24, type: 'triangle' }), i * 90)); };
   S.fail = () => { [330, 262, 196].forEach((f, i) => setTimeout(() => T({ f, dur: 0.25, vol: 0.24, type: 'triangle' }), i * 140)); };
   S.ting = () => { T({ f: 2093, dur: 0.35, vol: 0.22, type: 'sine' }); T({ f: 3150, dur: 0.22, vol: 0.08, type: 'sine' }); };
+  /* 乐器化音色：命中音与 BGM 主音共用音色配方 */
+  S.inst = function (name, i) {
+    const c = RF.audio.ctx;
+    if (!c) return;
+    const f = 261.63 * Math.pow(2, [0, 2, 4, 5, 7, 9, 11, 12][i % 8] / 12);
+    const t = t0();
+    switch (name) {
+      case 'piano':
+        T({ f, dur: 0.7, vol: 0.3, type: 'triangle' });
+        T({ f: f * 2, dur: 0.35, vol: 0.12, type: 'sine' });
+        T({ f: f * 3, dur: 0.15, vol: 0.05, type: 'sine' });
+        break;
+      case 'guitar': case 'bass': {
+        const bf = name === 'bass' ? f / 2 : f;
+        T({ f: bf, f2: bf * 0.995, dur: 0.45, vol: 0.3, type: 'sawtooth' });
+        T({ f: bf * 2, dur: 0.2, vol: 0.1, type: 'triangle' });
+        break;
+      }
+      case 'violin': case 'erhu': {
+        const o = c.createOscillator(), g = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
+        o.type = 'sawtooth'; o.frequency.value = f * (name === 'erhu' ? 2 : 1);
+        lfo.frequency.value = 5.5; lg.gain.value = f * 0.02;
+        lfo.connect(lg); lg.connect(o.frequency);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(0.24, t + 0.08);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+        o.connect(g); g.connect(RF.audio.sfx);
+        o.start(t); o.stop(t + 0.7); lfo.start(t); lfo.stop(t + 0.7);
+        break;
+      }
+      case 'flute':
+        T({ f: f * 2, dur: 0.5, vol: 0.24, type: 'sine', att: 0.04 });
+        N({ dur: 0.12, vol: 0.05, freq: 2600, filter: 'highpass' });
+        break;
+      case 'trumpet':
+        T({ f: f * 2, f2: f * 2.03, dur: 0.4, vol: 0.26, type: 'sawtooth', att: 0.02 });
+        T({ f: f * 4, dur: 0.2, vol: 0.07, type: 'square' });
+        break;
+      case 'harmonica':
+        T({ f: f * 2, dur: 0.35, vol: 0.2, type: 'square', att: 0.02 });
+        T({ f: f * 3, dur: 0.2, vol: 0.06, type: 'sine' });
+        break;
+      case 'drums': {
+        const d = RF.audio.drum;
+        [() => d.kick(t, 1), () => d.snare(t, 1), () => d.hat(t, 1), () => d.snare(t, 0.6), () => d.hat(t, 0.7)][i % 5]();
+        break;
+      }
+      case 'tri': S.ting(); break;
+      default: S.key(i);
+    }
+  };
   S.key = i => {
     const deg = [0, 2, 4, 7, 9, 12, 14, 16][i % 8];
     T({ f: 523.25 * Math.pow(2, deg / 12), dur: 0.28, vol: 0.26, type: 'triangle' });

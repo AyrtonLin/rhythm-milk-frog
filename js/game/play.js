@@ -55,7 +55,7 @@
     this.song = RF.music.make({
       seed: U.hashStr(cfg.id + 'music'), bpm: cfg.bpm,
       bars: Math.max(1, Math.ceil(this.chart.duration / (4 * this.chart.beatSec))),
-      style: cfg.style, accents: this.chart.notes.map(n => n.beat)
+      style: cfg.style, voice: cfg.params.voice, accents: this.chart.notes.map(n => n.beat)
     });
     this.scoreState = RF.scoring.create(this.chart.maxScore);
     this.winS = cfg.params.judgeScale || 1;      // 判定窗口倍率（赛车等关放宽）

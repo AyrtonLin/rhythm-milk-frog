@@ -288,6 +288,14 @@
     draw(r, ctx) {
       const m = r.m, w = RF.view.w, h = RF.view.h, u = RF.view.u, gy = r.groundY, now = r.now();
       ctx.save();
+      /* 记分牌 */
+      ctx.fillStyle = 'rgba(38,50,56,0.85)';
+      U.roundRect(ctx, w * 0.03, h * 0.12, 96 * u, 42 * u, 6 * u); ctx.fill();
+      ctx.fillStyle = '#FFD34D'; ctx.font = '800 ' + 14 * u + 'px system-ui,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(r.scoreState.combo + ' COMBO', w * 0.03 + 48 * u, h * 0.12 + 14 * u);
+      ctx.fillStyle = '#fff'; ctx.font = '700 ' + 11 * u + 'px system-ui,sans-serif';
+      ctx.fillText('P' + r.scoreState.p + ' G' + r.scoreState.g + ' M' + r.scoreState.m, w * 0.03 + 48 * u, h * 0.12 + 30 * u);
       /* 场地 */
       if (m.kind === 'badminton' || m.kind === 'tennis') {
         ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 3 * u;
