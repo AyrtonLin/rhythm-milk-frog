@@ -31,6 +31,8 @@
       if (k === 'goal') return { tx: w * 0.82, ty: gy - h * 0.1, corner: note ? note.aim % 4 : 0 };
       if (k === 'jianzi') return { ty: gy - (z / 100) * h * 0.52 };
       if (k === 'dart') return { tx: U.lerp(w * 0.5, w * 0.87, z / 100), ty: h * 0.4 };
+      if (k === 'plane') return { tx: U.lerp(w * 0.45, w * 0.88, z / 100), ty: h * 0.5 };
+      if (k === 'star') return { ty: gy - (z / 100) * h * 0.55 };
       return { tx: w * 0.7, ty: h * 0.4 };
     },
     update(r, dt) {
@@ -113,6 +115,13 @@
         } else if (m.kind === 'dart') {
           r.setPose('throw', 0.4);
           m.flights.push({ kind: 'flat', prop: 'dart', t: 0, dur: 0.45, fx: from.x, fy: from.y, tx: L.tx, ty: ok ? L.ty + U.rr(Math.random, -8, 8) : L.ty + U.clamp(diff, -40, 40) * RF.view.u * 1.4, ok, stickA: U.rr(Math.random, -0.2, 0.2) });
+        } else if (m.kind === 'plane') {
+          r.setPose('throw', 0.45);
+          m.flights.push({ kind: 'flat', prop: 'plane', t: 0, dur: 0.7, fx: from.x, fy: from.y, tx: ok ? L.tx : L.tx + U.clamp(diff, -30, 30) * RF.view.u * 1.5, ty: ok ? L.ty : L.ty + 50 * u, ok });
+        } else if (m.kind === 'star') {
+          r.setPose('throw', 0.5);
+          const apex = r.groundY - (power / 100) * RF.view.h * 0.6;
+          m.flights.push({ kind: 'up', prop: 'star', t: 0, dur: 0.9, fx: r.frog.x, fy: r.groundY - 30 * u, tx: r.frog.x + U.rr(Math.random, -40, 40), ty: 0, apex, lineY: L.ty, ok });
         }
         if (ok) r.setExpr(tier === 'P' ? 'stars' : 'happy', 0.5); else r.setExpr('sad', 0.7);
       } else {
@@ -126,7 +135,9 @@
       const m = r.m, w = RF.view.w, h = RF.view.h, u = RF.view.u, gy = r.groundY;
       const n = r.nextNote();
       ctx.save();
-      if (m.kind === 'basket') {
+      if (RF.scenes && RF.scenes['pow_' + m.kind]) {
+        RF.scenes['pow_' + m.kind](ctx, r, this.layout(r, n));
+      } else if (m.kind === 'basket') {
         const L = this.layout(r, n);
         ctx.save(); ctx.translate(L.tx, L.ty);
         if (m.netWig > 0) ctx.translate(Math.sin(m.netWig * 30) * 4 * u * m.netWig, 0);
@@ -411,6 +422,7 @@
       const final = correct ? tier : 'M';
       r.submit(note, final, { x: m.carX, y: r.groundY - 120 * RF.view.u });
       if (correct && final !== 'M') {
+        if (r.cfg.params.elbow) RF.fx.float('肘开!', m.carX, r.groundY - 150 * RF.view.u, '#FF7043', 44 * RF.view.u);
         if (side === 'U') r.setPose('jump', 0.5);
         else if (side === 'D') r.setPose('hide', 0.4);
         m.boost = 1; m.tilt = (side === 'L' ? -0.35 : side === 'R' ? 0.35 : 0);
@@ -428,6 +440,7 @@
       const m = r.m, w = RF.view.w, h = RF.view.h, u = RF.view.u, now = r.now();
       const gy = r.groundY;
       ctx.save();
+      if (RF.scenes && RF.scenes['race_' + r.cfg.params.kind]) RF.scenes['race_' + r.cfg.params.kind](ctx, r);
       /* 赛道（俯视竖卷） */
       const rw = w * 0.42;
       const rc = this.roadCenter(r, now);
