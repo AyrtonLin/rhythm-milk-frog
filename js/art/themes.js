@@ -112,6 +112,74 @@
       }
       return;
     }
+    if (stage === 3) {
+      /* 音乐厅：暗紫 + 舞台灯光 + 观众荧光棒 */
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#1A0B2E'); g.addColorStop(0.6, '#341B52'); g.addColorStop(1, '#24103A');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      /* 灯柱 */
+      for (let i = 0; i < 4; i++) {
+        const a = Math.sin(t * 0.8 + i * 1.7) * 0.35;
+        const x0 = w * (0.15 + i * 0.23);
+        ctx.save(); ctx.translate(x0, 0); ctx.rotate(a);
+        const lg = ctx.createLinearGradient(0, 0, 0, h * 0.8);
+        lg.addColorStop(0, 'rgba(255,211,77,0.35)'); lg.addColorStop(1, 'rgba(255,211,77,0)');
+        ctx.fillStyle = lg;
+        ctx.beginPath(); ctx.moveTo(-8 * RF.view.u, 0); ctx.lineTo(8 * RF.view.u, 0);
+        ctx.lineTo(60 * RF.view.u, h * 0.8); ctx.lineTo(-60 * RF.view.u, h * 0.8); ctx.closePath(); ctx.fill();
+        ctx.restore();
+      }
+      /* 舞台地板 */
+      const fy = h * 0.76;
+      const fg = ctx.createLinearGradient(0, fy, 0, h);
+      fg.addColorStop(0, '#5D4037'); fg.addColorStop(1, '#3E2723');
+      ctx.fillStyle = fg; ctx.fillRect(0, fy, w, h - fy);
+      ctx.fillStyle = 'rgba(255,235,59,0.25)';
+      U.ell(ctx, w * 0.5, fy + 6 * RF.view.u, w * 0.34, 10 * RF.view.u); ctx.fill();
+      /* 观众荧光棒 */
+      const r3 = U.mulberry32(11);
+      for (let i = 0; i < 26; i++) {
+        const x = r3() * w, y = h * 0.62 + r3() * h * 0.1;
+        const sw = Math.sin(t * 3 + i) * 6 * RF.view.u;
+        ctx.strokeStyle = ['rgba(90,200,250,0.7)', 'rgba(244,143,177,0.7)', 'rgba(129,199,132,0.7)'][i % 3];
+        ctx.lineWidth = 3 * RF.view.u;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + sw, y - 14 * RF.view.u); ctx.stroke();
+      }
+      return;
+    }
+    if (stage === 4) {
+      /* 办公室：灰蓝格子间 + 窗 + 白板 */
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#CFD8DC'); g.addColorStop(0.7, '#ECEFF1'); g.addColorStop(1, '#B0BEC5');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      /* 窗带 */
+      ctx.fillStyle = '#B3E5FC';
+      ctx.fillRect(0, h * 0.1, w, h * 0.16);
+      ctx.strokeStyle = '#FFFDF4'; ctx.lineWidth = 5 * RF.view.u;
+      for (let i = 1; i < 5; i++) { ctx.beginPath(); ctx.moveTo(w * i / 5, h * 0.1); ctx.lineTo(w * i / 5, h * 0.26); ctx.stroke(); }
+      /* 城市剪影 */
+      ctx.fillStyle = 'rgba(96,125,139,0.5)';
+      const r4 = U.mulberry32(5);
+      for (let i = 0; i < 10; i++) {
+        const bw = w * 0.06 + r4() * w * 0.05, bh = h * (0.05 + r4() * 0.08);
+        ctx.fillRect(i * w / 10 + 4, h * 0.26 - bh, bw, bh);
+      }
+      /* 地毯地面 */
+      const fy = h * 0.72;
+      ctx.fillStyle = '#78909C'; ctx.fillRect(0, fy, w, h - fy);
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      for (let i = 0; i < 8; i++) ctx.fillRect(i * w / 8, fy, w / 16, h - fy);
+      /* 格子间隔板 */
+      ctx.fillStyle = 'rgba(84,110,122,0.55)';
+      ctx.fillRect(w * 0.08, h * 0.42, 8 * RF.view.u, h * 0.3);
+      ctx.fillRect(w * 0.9, h * 0.42, 8 * RF.view.u, h * 0.3);
+      /* 白板 */
+      ctx.fillStyle = '#FFFDF4'; U.roundRect(ctx, w * 0.72, h * 0.32, w * 0.18, h * 0.14, 6 * RF.view.u); ctx.fill();
+      ctx.strokeStyle = '#90A4AE'; ctx.lineWidth = 3 * RF.view.u; U.roundRect(ctx, w * 0.72, h * 0.32, w * 0.18, h * 0.14, 6 * RF.view.u); ctx.stroke();
+      ctx.strokeStyle = '#EF5350'; ctx.lineWidth = 2 * RF.view.u;
+      ctx.beginPath(); ctx.moveTo(w * 0.74, h * 0.42); ctx.lineTo(w * 0.78, h * 0.37); ctx.lineTo(w * 0.82, h * 0.4); ctx.lineTo(w * 0.87, h * 0.34); ctx.stroke();
+      return;
+    }
     /* 其余阶段：占位渐变（后续阶段开发时补全） */
     const pal = {
       2: ['#FFE0B2', '#FFF3E0'], 3: ['#4A148C', '#7B1FA2'], 4: ['#B0BEC5', '#ECEFF1'],
