@@ -180,6 +180,57 @@
       ctx.beginPath(); ctx.moveTo(w * 0.74, h * 0.42); ctx.lineTo(w * 0.78, h * 0.37); ctx.lineTo(w * 0.82, h * 0.4); ctx.lineTo(w * 0.87, h * 0.34); ctx.stroke();
       return;
     }
+    if (stage === 5) {
+      /* 教室：黑板 + 窗户 + 课桌列 + 标语 */
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#FFF8E1'); g.addColorStop(1, '#FFECB3');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#33691E';
+      U.roundRect(ctx, w * 0.22, h * 0.1, w * 0.56, h * 0.24, 6 * RF.view.u); ctx.fill();
+      ctx.strokeStyle = '#8D6E63'; ctx.lineWidth = 5 * RF.view.u;
+      U.roundRect(ctx, w * 0.22, h * 0.1, w * 0.56, h * 0.24, 6 * RF.view.u); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.font = '700 ' + 14 * RF.view.u + 'px system-ui,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('好好学习 · 天天向上', w * 0.5, h * 0.16);
+      ctx.fillStyle = '#B3E5FC';
+      ctx.fillRect(w * 0.04, h * 0.12, w * 0.14, h * 0.2);
+      ctx.fillRect(w * 0.82, h * 0.12, w * 0.14, h * 0.2);
+      ctx.strokeStyle = '#FFFDF4'; ctx.lineWidth = 4 * RF.view.u;
+      ctx.strokeRect(w * 0.04, h * 0.12, w * 0.14, h * 0.2);
+      ctx.strokeRect(w * 0.82, h * 0.12, w * 0.14, h * 0.2);
+      const fy = h * 0.74;
+      ctx.fillStyle = '#D7CCC8'; ctx.fillRect(0, fy, w, h - fy);
+      ctx.fillStyle = 'rgba(141,110,99,0.35)';
+      for (let r2 = 0; r2 < 2; r2++) for (let i = 0; i < 4; i++) {
+        U.roundRect(ctx, w * (0.1 + i * 0.22), fy - 26 * RF.view.u + r2 * 30 * RF.view.u, w * 0.16, 10 * RF.view.u, 3 * RF.view.u); ctx.fill();
+      }
+      return;
+    }
+    if (stage === 6) {
+      /* 人生：深邃星空 + 极光 + 浮岛 */
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#0D0B2A'); g.addColorStop(0.55, '#241B4D'); g.addColorStop(1, '#120E33');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      const rs = U.mulberry32(21);
+      for (let i = 0; i < 60; i++) {
+        const x = rs() * w, y = rs() * h * 0.7, tw = 0.4 + 0.6 * Math.abs(Math.sin(t * (0.6 + rs()) + i));
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.25 + tw * 0.6).toFixed(3) + ')';
+        U.circle(ctx, x, y, (0.8 + rs() * 1.4) * RF.view.u); ctx.fill();
+      }
+      for (let b = 0; b < 3; b++) {
+        ctx.strokeStyle = ['rgba(129,212,250,0.22)', 'rgba(186,104,200,0.2)', 'rgba(129,199,132,0.18)'][b];
+        ctx.lineWidth = 26 * RF.view.u;
+        ctx.beginPath();
+        for (let x = 0; x <= w; x += w / 12) {
+          ctx.lineTo(x, h * (0.2 + b * 0.08) + Math.sin(x * 0.008 + t * 0.5 + b * 2) * 30 * RF.view.u);
+        }
+        ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(18,14,51,0.9)';
+      U.ell(ctx, w * 0.2, h * 0.86, w * 0.24, h * 0.06); ctx.fill();
+      U.ell(ctx, w * 0.78, h * 0.9, w * 0.3, h * 0.07); ctx.fill();
+      return;
+    }
     /* 其余阶段：占位渐变（后续阶段开发时补全） */
     const pal = {
       2: ['#FFE0B2', '#FFF3E0'], 3: ['#4A148C', '#7B1FA2'], 4: ['#B0BEC5', '#ECEFF1'],
