@@ -68,6 +68,50 @@
       }
       return;
     }
+    if (stage === 2) {
+      /* 温馨家居：暖墙 + 窗 + 挂钟 + 木地板 + 绿植 */
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#FFE3C0'); g.addColorStop(0.7, '#FFF6E8'); g.addColorStop(1, '#FFEFD8');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      /* 窗 */
+      const wx = w * 0.7, wy = h * 0.14, ww = w * 0.22, wh = h * 0.24;
+      ctx.fillStyle = '#B3E5FC'; ctx.fillRect(wx, wy, ww, wh);
+      ctx.fillStyle = 'rgba(255,244,180,0.8)'; U.circle(ctx, wx + ww * 0.7, wy + wh * 0.3, 14 * RF.view.u); ctx.fill();
+      ctx.strokeStyle = '#FFFDF4'; ctx.lineWidth = 6 * RF.view.u;
+      ctx.strokeRect(wx, wy, ww, wh);
+      ctx.beginPath(); ctx.moveTo(wx + ww / 2, wy); ctx.lineTo(wx + ww / 2, wy + wh);
+      ctx.moveTo(wx, wy + wh / 2); ctx.lineTo(wx + ww, wy + wh / 2); ctx.stroke();
+      ctx.fillStyle = '#F48FB1';
+      ctx.fillRect(wx - 10 * RF.view.u, wy - 8 * RF.view.u, 14 * RF.view.u, wh + 16 * RF.view.u);
+      ctx.fillRect(wx + ww - 4 * RF.view.u, wy - 8 * RF.view.u, 14 * RF.view.u, wh + 16 * RF.view.u);
+      /* 挂钟 */
+      ctx.fillStyle = '#FFFDF4'; U.circle(ctx, w * 0.18, h * 0.16, 26 * RF.view.u); ctx.fill();
+      ctx.strokeStyle = '#8D6E63'; ctx.lineWidth = 4 * RF.view.u; U.circle(ctx, w * 0.18, h * 0.16, 26 * RF.view.u); ctx.stroke();
+      ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 3 * RF.view.u;
+      ctx.beginPath(); ctx.moveTo(w * 0.18, h * 0.16); ctx.lineTo(w * 0.18, h * 0.16 - 16 * RF.view.u);
+      ctx.moveTo(w * 0.18, h * 0.16); ctx.lineTo(w * 0.18 + Math.cos(t) * 10 * RF.view.u, h * 0.16 + Math.sin(t) * 10 * RF.view.u); ctx.stroke();
+      /* 地板 */
+      const fy = h * 0.72;
+      const fg = ctx.createLinearGradient(0, fy, 0, h);
+      fg.addColorStop(0, '#D7A86E'); fg.addColorStop(1, '#B9834B');
+      ctx.fillStyle = fg; ctx.fillRect(0, fy, w, h - fy);
+      ctx.strokeStyle = 'rgba(120,70,20,0.3)'; ctx.lineWidth = 2;
+      for (let i = 0; i < 7; i++) { ctx.beginPath(); ctx.moveTo(w * i / 7, fy); ctx.lineTo(w * i / 7 - 24, h); ctx.stroke(); }
+      /* 地毯 */
+      ctx.fillStyle = 'rgba(244,143,177,0.35)';
+      U.ell(ctx, w * 0.5, h * 0.86, w * 0.3, h * 0.07); ctx.fill();
+      /* 绿植 */
+      ctx.fillStyle = '#BC6C25';
+      ctx.beginPath(); ctx.moveTo(w * 0.06, fy - 4); ctx.lineTo(w * 0.12, fy - 4); ctx.lineTo(w * 0.11, fy + 30 * RF.view.u); ctx.lineTo(w * 0.07, fy + 30 * RF.view.u); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#66BB6A';
+      for (let i = -2; i <= 2; i++) { U.ell(ctx, w * 0.09 + i * 8 * RF.view.u, fy - 26 * RF.view.u + Math.abs(i) * 6 * RF.view.u, 6 * RF.view.u, 16 * RF.view.u, i * 0.3); ctx.fill(); }
+      /* 尘埃光斑 */
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      for (let i = 0; i < 6; i++) {
+        U.circle(ctx, (i * 173 + t * 10) % w, h * (0.2 + (i * 0.13) % 0.4) + Math.sin(t + i) * 8, 2.5 * RF.view.u); ctx.fill();
+      }
+      return;
+    }
     /* 其余阶段：占位渐变（后续阶段开发时补全） */
     const pal = {
       2: ['#FFE0B2', '#FFF3E0'], 3: ['#4A148C', '#7B1FA2'], 4: ['#B0BEC5', '#ECEFF1'],

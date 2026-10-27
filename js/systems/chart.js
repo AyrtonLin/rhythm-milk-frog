@@ -50,6 +50,15 @@
         const prev = notes[k - 1];
         if (k > 2 && r() < 0.16) n.dir = r() < 0.5 ? 'U' : 'D';   // 跳跃/下蹲障碍
         else n.dir = (prev && (prev.dir === 'L' || prev.dir === 'R') && r() < 0.55) ? prev.dir : (r() < 0.5 ? 'L' : 'R');
+      } else if (cfg.mech === 'target') {
+        n.px = U.rr(r, 0.2, 0.8); n.py = U.rr(r, 0.3, 0.58);
+        n.ph = U.rr(r, 0, 6.28); n.side = r() < 0.5 ? 0 : 1;
+      } else if (cfg.mech === 'beattap') {
+        n.px = U.rr(r, 0.25, 0.75); n.py = U.rr(r, 0.4, 0.62);
+      } else if (cfg.mech === 'fall') {
+        n.lane = Math.floor(r() * 3);
+      } else if (cfg.mech === 'choice') {
+        n.item = Math.floor(r() * 8);
       }
     });
     /* 满分模拟：全 Perfect 连击加成 */

@@ -63,12 +63,12 @@
     const w = RF.view.w, h = RF.view.h, u = RF.view.u;
     this.groundY = h * 0.8;
     const s = u * 1.05;
-    let fx = w * 0.24, face = 1;
-    if (cfg.mech === 'swing') {
+    let fx = w * 0.5, face = 1;
+    if (cfg.mech === 'power' && cfg.params.kind !== 'jianzi') fx = w * 0.24;
+    else if (cfg.mech === 'swing') {
       if (cfg.params.kind === 'vb' || cfg.params.kind === 'frisbee') { fx = w * 0.5; face = 1; }
       else { fx = w * 0.7; face = -1; }
-    } else if (cfg.mech === 'power' && cfg.params.kind === 'jianzi') { fx = w * 0.5; }
-    else if (cfg.mech === 'race') { fx = w / 2; }
+    } else if (cfg.mech === 'race') { fx = w / 2; }
     this.frog = {
       x: fx, y: this.groundY - 52 * s, s, face, pose: 'idle', poseT: 0, poseDur: 0,
       expr: 'normal', exprT: 0, charge: 0, blink: 1,

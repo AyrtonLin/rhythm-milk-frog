@@ -90,7 +90,7 @@
     }
   };
   A._schedule = function (ev, t) {
-    const S = ev.style || {};
+    const S = (A._st && A._st.song && A._st.song.style) || {};
     switch (ev.tr) {
       case 'lead': A.tone({ t, f: ev.f, dur: ev.dur, vol: ev.vol, type: S.wave || 'square' }); break;
       case 'bass': A.tone({ t, f: ev.f, dur: ev.dur, vol: ev.vol || 0.34, type: S.bassWave || 'triangle' }); break;
