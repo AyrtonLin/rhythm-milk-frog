@@ -366,9 +366,8 @@
   /* ============ 原型 3：Race 赛车剧本（点击左右踩拍过弯） ============ */
   M.race = {
     init(r) {
-      r.m = { carX: RF.view.w / 2, tilt: 0, speed: 1, scroll: 0, wobble: 0, boost: 0, finished: false };
-      r.frog.prop = 'wheel';
-      r.frog.propHand = 'R';
+      r.m = { carX: RF.view.w / 2, tilt: 0, speed: 1, scroll: 0, wobble: 0, boost: 0, finished: false, run: r.cfg.params.kind === 'run' };
+      r.frog.prop = r.cfg.params.prop || (r.m.run ? null : 'wheel');
     },
     roadCenter(r, t) {
       const w = RF.view.w;
@@ -390,6 +389,7 @@
       m.carX = U.lerp(m.carX, rc, dt * (off > w * 0.12 ? 1.2 : 4));
       m.tilt = U.lerp(m.tilt, U.clamp((rc - m.carX) / (w * 0.1), -1, 1) * 0.3, dt * 8);
       if (off > w * 0.14 && Math.random() < 0.3) RF.fx.burst(m.carX, r.groundY - 10, '#B0BEC5', 2, { speed: 60, grav: 200 });
+      if (m.run) { r.frog.pose = 'run'; r.frog.poseDur = 0; }
       r.cueX = m.carX; r.cueY = r.groundY - 105 * RF.view.u;
       if (now > r.chart.duration - 0.6 && !m.finished) { m.finished = true; RF.sfx.whistle(); RF.fx.confetti(w / 2, RF.view.h * 0.4, 24); }
     },
@@ -423,7 +423,7 @@
       /* 赛道（俯视竖卷） */
       const rw = w * 0.42;
       const rc = this.roadCenter(r, now);
-      ctx.fillStyle = '#607D8B';
+      ctx.fillStyle = m.run ? '#9E9E9E' : '#607D8B';
       ctx.beginPath();
       ctx.moveTo(rc - rw / 2, h); ctx.lineTo(rc + rw / 2, h);
       const top = h * 0.32, rct = this.roadCenter(r, now + 2.2);
@@ -474,7 +474,23 @@
         if (n.dir === 'D') { ctx.fillStyle = 'rgba(66,165,245,0.9)'; ctx.fillRect(-rw * 0.16, -36 * u, rw * 0.32, 7 * u); }
         ctx.restore();
       }
+      /* 公交（赶公交关） */
+      if (m.run) {
+        const bx = this.roadCenter(r, now + 1.6), by = top + 50 * u;
+        ctx.fillStyle = '#66BB6A';
+        U.roundRect(ctx, bx - 42 * u, by - 30 * u, 84 * u, 48 * u, 8 * u); ctx.fill();
+        ctx.fillStyle = '#B3E5FC';
+        for (let i = 0; i < 3; i++) { U.roundRect(ctx, bx - 34 * u + i * 23 * u, by - 24 * u, 17 * u, 13 * u, 3 * u); ctx.fill(); }
+        ctx.fillStyle = '#212121';
+        U.circle(ctx, bx - 26 * u, by + 18 * u, 7 * u); ctx.fill();
+        U.circle(ctx, bx + 26 * u, by + 18 * u, 7 * u); ctx.fill();
+        const left = Math.max(0, Math.round((r.chart.count - r.scoreState.p - r.scoreState.g) * 3));
+        ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.font = '800 ' + 13 * u + 'px system-ui,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('距公交 ' + left + ' 米', bx, by - 42 * u);
+      }
       /* 卡丁车 + 奶蛙 */
+      if (!m.run) {
       ctx.save();
       ctx.translate(m.carX, gy - 6 * u);
       ctx.rotate(m.tilt + Math.sin(now * 40) * m.wobble * 0.06);
@@ -490,8 +506,9 @@
       ctx.fillStyle = '#FFCDD2';
       RF.util.roundRect(ctx, -14 * ks, 2 * ks, 28 * ks, 10 * ks, 4 * ks); ctx.fill();
       ctx.restore();
-      r.frog.x = m.carX; r.frog.y = gy - 34 * u; r.frog.s = u * 0.85;
-      M.drawFrog(r, ctx, { noShadow: true });
+      }
+      if (m.run) { r.frog.x = m.carX; r.frog.y = gy - 50 * u; r.frog.s = u; M.drawFrog(r, ctx); }
+      else { r.frog.x = m.carX; r.frog.y = gy - 34 * u; r.frog.s = u * 0.85; M.drawFrog(r, ctx, { noShadow: true }); }
       ctx.restore();
     }
   };
