@@ -48,6 +48,14 @@
   P.start = function (cfg) {
     this.cfg = cfg;
     this.chart = RF.chart.make(cfg);
+    /* 蓄力关：开局 3 秒倒计时，谱面整体后移，保证“按住!”提示在倒计时后出现 */
+    this._cdLast = 0;
+    if (cfg.mech === 'power') {
+      const off = 3 / this.chart.beatSec;
+      this.chart.notes.forEach(n => { n.beat += off; n.t += 3; });
+      this.chart.duration += 3;
+      this.chart.totalBeats += off;
+    }
     this.song = RF.music.make({
       seed: U.hashStr(cfg.id + 'music'), bpm: cfg.bpm, bars: Math.round(cfg.beats / 4),
       style: cfg.style, accents: this.chart.notes.map(n => n.beat)
@@ -116,6 +124,15 @@
 
     const now = this.now();
     this._cardT = Math.max(0, this._cardT - dt);
+    /* 倒计时滴声 */
+    if (this.cfg.mech === 'power') {
+      if (now < 3) {
+        const c = Math.ceil(3 - now);
+        if (c !== this._cdLast) { this._cdLast = c; RF.sfx.count(false); }
+      } else if (this._cdLast > 0) {
+        this._cdLast = 0; RF.sfx.count(true);
+      }
+    }
     /* 漏拍自动 Miss */
     for (const n of this.chart.notes) {
       if (!n.judged && now > n.t + J.G * this.winS + 0.02) {
@@ -151,6 +168,29 @@
       }
       RF.hud.draw(this, ctx);
       if (this.cfg.params.dpad) RF.hud.drawDpad(ctx);
+      /* 蓄力关开局 3 秒倒计时 */
+      if (this.cfg.mech === 'power' && this.state === 'play' && this.now() < 3) {
+        const tn = this.now();
+        const num = Math.ceil(3 - tn);
+        const phase = 1 - ((3 - tn) - (num - 1));
+        const sc = 1 + 0.6 * (1 - Math.min(1, phase * 2.5));
+        ctx.save();
+        ctx.translate(w / 2, h * 0.42);
+        ctx.scale(sc, sc);
+        ctx.globalAlpha = phase < 0.8 ? 1 : (1 - phase) / 0.2;
+        ctx.font = '900 ' + 92 * u + 'px system-ui,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.lineWidth = 10; ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+        ctx.strokeText(num, 0, 0);
+        ctx.fillStyle = '#FFB300';
+        ctx.fillText(num, 0, 0);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+        ctx.font = '700 ' + 16 * u + 'px system-ui,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        ctx.fillStyle = 'rgba(90,60,20,0.85)';
+        ctx.fillText('准备… 黄圈出现时按住', w / 2, h * 0.42 + 62 * u);
+      }
       if (this._cardT > 0) {
         const a = Math.min(1, this._cardT / 0.4);
         ctx.globalAlpha = a;

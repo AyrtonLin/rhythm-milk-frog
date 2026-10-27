@@ -170,6 +170,10 @@ function autoPlay(cfg, maxSec) {
           n._apDone = true;
           const ev = { id: 'ap', x: RF.view.w / 2, y: RF.view.h / 2 };
           if (typeof n.dir === 'string') ev.dir = n.dir;
+          /* 位置敏感机制：target 点目标本体 / fall 点对应轨道 / choice 点正确分类桶 */
+          if (cfg.mech === 'target') { const p = RF.mech.target.posAt(RF.play, n, t); ev.x = p.x; ev.y = p.y; }
+          else if (cfg.mech === 'fall') { ev.x = RF.play.m.laneX[n.lane] * RF.view.w; ev.y = RF.view.h * 0.62; }
+          else if (cfg.mech === 'choice') { ev.x = RF.mech.choice.binX(RF.mech.choice.answer(n)); ev.y = RF.view.h * 0.66; }
           RF.play.down(ev);
         }
       }
@@ -226,62 +230,49 @@ if (RF.view.landscape === false) pass('竖屏自适应切换（layout 重算无�
 RF.audio.stop(); RF.play.active = false; RF.play.state = 'idle';
 global.innerWidth = 896; global.innerHeight = 414; RF.view.resize();
 
-/* ---------------- 1-3 ~ 1-9 快速冒烟 ---------------- */
-console.log('\n[1-3 ~ 1-9 逐关冒烟（各 6 秒 + 渲染）]');
-for (let i = 3; i <= 9; i++) {
-  const cfg = RF.registry.get('1-' + i);
+/* ---------------- 全关卡全自动完美通关 ---------------- */
+function fullRun(id) {
+  const cfg = RF.registry.get(id);
+  if (!cfg) { fail(id + ' 未注册'); return; }
   try {
     RF.ui.startLevel(cfg);
-    autoPlay(cfg, 6);
+    autoPlay(cfg, 80);
     const sc = RF.play.scoreState;
-    const noteStr = cfg.mech + '/' + (cfg.params.kind || '');
-    if (RF.play.active && RF.audio.playing() && sc) pass('1-' + i + ' ' + cfg.name + '（' + noteStr + '）运行正常');
-    else pass('1-' + i + ' ' + cfg.name + '（' + noteStr + '）运行正常（已结束）');
-    RF.audio.stop(); RF.play.active = false; RF.play.state = 'idle';
+    if (!sc || RF.play.active) { fail(id + ' ' + cfg.name + ' 未在时限内结束'); RF.audio.stop(); RF.play.active = false; RF.play.state = 'idle'; return; }
+    const res = sc.finish();
+    const total = sc.p + sc.g + sc.m;
+    if (total !== RF.play.chart.notes.length) fail(id + ' 判定数 ' + total + ' ≠ 音符数 ' + RF.play.chart.notes.length);
+    if (sc.m !== 0) fail(id + ' 出现 Miss ×' + sc.m + '（全自动玩家应为 0）');
+    const rec = RF.save.get().levels[id];
+    const gi = RF.registry.gi(cfg);
+    if (RF.save.get().unlocked < gi + 1) fail(id + ' 解锁进度未推进（=' + RF.save.get().unlocked + '）');
+    if (!rec || !rec.cleared) fail(id + ' 未记录通关');
+    pass(id + ' ' + cfg.name + '：' + sc.p + 'P/' + sc.g + 'G/' + sc.m + 'M · ' + res.rank + ' · ' + sc.score + '/' + sc.maxScore + (rec && rec.cleared ? ' · 已存档' : ''));
   } catch (e) {
-    fail('1-' + i + ' ' + cfg.name + ' 异常: ' + e.message);
+    fail(id + ' ' + (cfg.name || '') + ' 异常: ' + e.message);
     console.error('   ', e.stack.split('\n').slice(0, 4).join('\n    '));
-    RF.audio.stop(); RF.play.active = false;
+    RF.audio.stop(); RF.play.active = false; RF.play.state = 'idle';
   }
 }
 
-/* ---------------- 2-1 ~ 2-10 快速冒烟 ---------------- */
-console.log('\n[2-1 ~ 2-10 逐关冒烟（各 6 秒 + 渲染）]');
-for (let i = 1; i <= 10; i++) {
-  const cfg = RF.registry.get('2-' + i);
-  if (!cfg) { fail('2-' + i + ' 未注册'); continue; }
-  try {
-    RF.ui.startLevel(cfg);
-    autoPlay(cfg, 6);
-    const sc = RF.play.scoreState;
-    const noteStr = cfg.mech + '/' + (cfg.params.kind || '');
-    if (RF.play.active && RF.audio.playing() && sc) pass('2-' + i + ' ' + cfg.name + '（' + noteStr + '）运行正常');
-    else pass('2-' + i + ' ' + cfg.name + '（' + noteStr + '）运行正常（已结束）');
-    RF.audio.stop(); RF.play.active = false; RF.play.state = 'idle';
-  } catch (e) {
-    fail('2-' + i + ' ' + cfg.name + ' 异常: ' + e.message);
-    console.error('   ', e.stack.split('\n').slice(0, 4).join('\n    '));
-    RF.audio.stop(); RF.play.active = false;
-  }
-}
+console.log('\n[第一阶段 1-2 ~ 1-9 全自动通关]');
+for (let i = 2; i <= 9; i++) fullRun('1-' + i);
 
-/* ---------------- 1-10 赛车全程 → 阶段庆祝 ---------------- */
 console.log('\n[1-10 冲刺赛车 · 全程 → 第一阶段庆祝]');
-try {
-  RF.ui.startLevel(RF.registry.get('1-10'));
-  autoPlay(RF.play.cfg, 75);
-  if (calls.celebration.includes(1)) pass('冲线后弹出阶段庆祝界面 🎉');
-  else fail('未弹出阶段庆祝');
-  if (RF.save.get().unlocked === 11) pass('通关 1-10，全局解锁进度 = 11');
-  else fail('解锁进度=' + RF.save.get().unlocked);
-  const clearedIds = RF.registry.list().filter(l => (RF.save.get().levels[l.id] || {}).cleared).map(l => l.id);
-  pass('已完整通关: ' + (clearedIds.join(', ') || '无'));
-  if (clearedIds.includes('1-1') && clearedIds.includes('1-10')) pass('阶段汇总正确（完整游玩的关卡均已记录）');
-  else fail('通关记录缺失: ' + clearedIds.join(','));
-} catch (e) {
-  fail('1-10 异常: ' + e.message);
-  console.error('   ', e.stack.split('\n').slice(0, 5).join('\n    '));
-}
+fullRun('1-10');
+if (calls.celebration.includes(1)) pass('冲线后弹出第一阶段庆祝界面 🎉');
+else fail('未弹出第一阶段庆祝');
+
+console.log('\n[第二阶段 2-1 ~ 2-10 全自动通关]');
+for (let i = 1; i <= 10; i++) fullRun('2-' + i);
+if (calls.celebration.includes(2)) pass('第二阶段完成弹出庆祝界面 🎉');
+else fail('未弹出第二阶段庆祝');
+if (RF.save.get().unlocked === 21) pass('通关 2-10，全局解锁进度 = 21');
+else fail('解锁进度=' + RF.save.get().unlocked);
+const clearedIds = RF.registry.list().filter(l => (RF.save.get().levels[l.id] || {}).cleared).map(l => l.id);
+pass('已完整通关: ' + (clearedIds.join(', ') || '无'));
+if (clearedIds.length === 20) pass('两阶段 20 / 20 关全部通关');
+else fail('通关数不完整: ' + clearedIds.length + '/20');
 
 /* ---------------- 选关界面渲染 ---------------- */
 try {
