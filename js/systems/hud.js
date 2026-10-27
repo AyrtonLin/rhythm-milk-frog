@@ -141,18 +141,33 @@
     if (r.cfg && r.cfg.mech === 'power' && n.zone) {
       win = Math.max(0.3, n.zone.c / 100 * RF.chart.FULL);
     }
-    const dt = n.t - now;
-    if (dt > 0 && dt < win) {
-      const k = dt / win;
-      ctx.strokeStyle = 'rgba(255,211,77,' + (0.95 - 0.55 * k).toFixed(3) + ')';
-      ctx.lineWidth = 4.5 * u;
-      RF.util.circle(ctx, x, y, (24 + 78 * k) * u); ctx.stroke();
-      /* 起按提示：黄圈刚出现时闪一下 */
-      if (k > 0.9) {
-        ctx.strokeStyle = 'rgba(255,255,255,' + ((k - 0.9) * 6).toFixed(3) + ')';
-        ctx.lineWidth = 3 * u;
-        RF.util.circle(ctx, x, y, (24 + 78 * k + 10) * u); ctx.stroke();
+    /* 逼近环：窗口内每个未判定音符都有完整缩圈（最近的最亮，后续淡环预告） */
+    const list = [];
+    for (const nn of r.chart.notes) {
+      if (nn.judged) continue;
+      const d = nn.t - now;
+      if (d > 0 && d < win) list.push(nn);
+      if (list.length >= 3) break;
+    }
+    list.forEach((nn, idx) => {
+      const k = (nn.t - now) / win;
+      if (idx === 0) {
+        ctx.strokeStyle = 'rgba(255,211,77,' + (0.95 - 0.55 * k).toFixed(3) + ')';
+        ctx.lineWidth = 4.5 * u;
+        RF.util.circle(ctx, x, y, (24 + 78 * k) * u); ctx.stroke();
+        if (k > 0.9) {
+          ctx.strokeStyle = 'rgba(255,255,255,' + ((k - 0.9) * 6).toFixed(3) + ')';
+          ctx.lineWidth = 3 * u;
+          RF.util.circle(ctx, x, y, (24 + 78 * k + 10) * u); ctx.stroke();
+        }
+      } else {
+        ctx.strokeStyle = 'rgba(255,255,255,' + (0.4 * (1 - k) + 0.08).toFixed(3) + ')';
+        ctx.lineWidth = 2.5 * u;
+        RF.util.circle(ctx, x, y, (24 + 78 * k) * u); ctx.stroke();
       }
+    });
+    if (list.length && r.cfg && r.cfg.mech === 'power') {
+      const k = (list[0].t - now) / win;
       /* 文字提示：蓄力关 黄圈收缩全程“按住!” → 末段“松手!” */
       if (r.cfg && r.cfg.mech === 'power') {
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -170,13 +185,15 @@
           ctx.fillStyle = '#EF5350'; ctx.fillText('松手!', x, y - 64 * u);
         }
       }
-    } else if (dt <= 0 && dt > -0.12) {
+    }
+    const dt0 = n.t - now;
+    if (dt0 <= 0 && dt0 > -0.12) {
       ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 5.5 * u;
       RF.util.circle(ctx, x, y, 26 * u); ctx.stroke();
       /* 合拢瞬间动作字 */
       const act = r.cfg && (r.cfg.mech === 'power' ? '松手!' : r.cfg.mech === 'swing' ? '点!' : null);
       if (act) {
-        ctx.globalAlpha = Math.max(0, 1 + dt / 0.12);
+        ctx.globalAlpha = Math.max(0, 1 + dt0 / 0.12);
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.font = '900 ' + (27 * u) + 'px system-ui,sans-serif';
         ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(255,255,255,0.95)';
