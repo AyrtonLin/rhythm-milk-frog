@@ -20,10 +20,11 @@
     /* 以基础间隔铺点，再按种子做 ±0.5 拍微扰（保持网格对齐） */
     let base = Math.max(0.5, Math.round((usable / count) * 2) / 2);
     if (cfg.mech === 'power') {
-      /* 蓄力关：按关卡定音符数与间隔，含波间倒计时总时长 ≈ 1 分钟 */
+      /* 蓄力关：每个音符前都有 3 秒倒计时 → 音符间隔 ≥ 3.6s，时长适当放宽 */
       const li = (cfg.levelIdx - 1) % 10;
-      count = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30][li];
-      base = [6, 5.5, 5, 4.5, 4, 4, 3.5, 3.5, 3, 3][li];
+      count = [12, 12, 13, 13, 14, 14, 15, 15, 16, 16][li];
+      const gapSec = [4.5, 4.4, 4.3, 4.2, 4.1, 4.0, 3.9, 3.8, 3.7, 3.6][li];
+      base = Math.max(2, Math.round(gapSec / beatSec * 2) / 2);
     }
     let t = intro, i = 0;
     while (t <= total - outro && i < count + (cfg.mech === 'power' ? 1 : 6)) {
@@ -36,27 +37,21 @@
       t = Math.round((t + Math.max(0.5, gap)) * 2) / 2;
       i++;
     }
-    /* 蓄力关：开局倒计时 + 每 10 音符一波、波间 4 秒（3 秒倒计时 + 1 秒提示缓冲） */
-    let waveStarts = null;
+    /* 蓄力关：开局预留首个 3 秒倒计时 */
+    let cdSegs = null;
     if (cfg.mech === 'power') {
-      const WAVE = 10;
-      const GAPB = 4 / beatSec;
-      const baseOff = Math.max(0.5, (4 - intro * beatSec) / beatSec);
-      notes.forEach((n, k) => {
-        const wv = Math.floor(k / WAVE);
-        n.beat += baseOff + wv * GAPB;
-        n.t = n.beat * beatSec;
-      });
+      const baseOff = Math.max(0.5, (4.2 - intro * beatSec) / beatSec);
+      notes.forEach(n => { n.beat += baseOff; n.t = n.beat * beatSec; });
       total = Math.ceil(notes[notes.length - 1].beat) + 4;
     }
     /* 机制附加字段 */
     const zoneCenters = [35, 55, 72, 88];
     notes.forEach((n, k) => {
       if (cfg.mech === 'power') {
-        /* 目标力度所需按压时长必须 ≤ 与上一拍间隔 → 提示永远按得出来 */
+        /* 目标力度所需按压时长必须 ≤ 间隔-3.6s（前面要放 3 秒倒计时） */
         const prevB = k > 0 ? notes[k - 1].beat : 0;
         const avail = (n.beat - prevB) * beatSec;
-        const maxC = U.clamp(avail / C.FULL * 100 * 0.85, 30, 95);
+        const maxC = U.clamp(Math.min(avail / C.FULL * 100 * 0.85, (avail - 3.6) / C.FULL * 100), 30, 95);
         let c = zoneCenters[Math.floor(r() * zoneCenters.length)] + U.rr(r, -6, 6);
         c = Math.min(c, maxC);
         n.zone = { c: U.clamp(c, 20, 95), p: 10, g: 20 };   // 力度目标区间（P/G 半宽）
@@ -80,19 +75,19 @@
         n.item = Math.floor(r() * 8);
       }
     });
+    /* 蓄力关：每个音符的倒计时段（终点 = 该音符“按住!”出现时刻） */
+    if (cfg.mech === 'power') {
+      cdSegs = notes.map((n, k) => {
+        const cue = n.t - n.zone.c / 100 * C.FULL;
+        return { a: Math.max(0.2, cue - 3), b: cue, i: k };
+      });
+    }
     /* 满分模拟：全 Perfect 连击加成 */
     let combo = 0, maxScore = 0;
     notes.forEach(() => { combo++; maxScore += 300 * C.comboMult(combo); });
-    /* 蓄力关：倒计时终点 = 每波首个“按住!”提示出现时刻 */
-    if (cfg.mech === 'power') {
-      waveStarts = [];
-      for (let k = 0; k < notes.length; k += 10) {
-        waveStarts.push(Math.max(0.2, notes[k].t - notes[k].zone.c / 100 * C.FULL));
-      }
-    }
     return {
       notes, beatSec, duration: total * beatSec, totalBeats: total, maxScore,
-      count: notes.length, waveStarts
+      count: notes.length, cdSegs
     };
   };
   C.comboMult = combo => 1 + Math.min(0.5, Math.floor(combo / 10) * 0.05);

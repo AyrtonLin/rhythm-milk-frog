@@ -152,18 +152,18 @@
         ctx.lineWidth = 3 * u;
         RF.util.circle(ctx, x, y, (24 + 78 * k + 10) * u); ctx.stroke();
       }
-      /* 文字提示：蓄力关 按住! → 松手! */
+      /* 文字提示：蓄力关 黄圈收缩全程“按住!” → 末段“松手!” */
       if (r.cfg && r.cfg.mech === 'power') {
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.font = '900 ' + (27 * u) + 'px system-ui,sans-serif';
-        if (k > 0.55) {
+        if (k > 0.2) {
           const pop = RF.util.easeOutBack(Math.min(1, (1 - k) / 0.25));
           ctx.save(); ctx.translate(x, y - 64 * u); ctx.scale(pop, pop);
           ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(255,255,255,0.95)';
           ctx.strokeText('按住!', 0, 0);
           ctx.fillStyle = '#FFB300'; ctx.fillText('按住!', 0, 0);
           ctx.restore();
-        } else if (k < 0.2) {
+        } else {
           ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(255,255,255,0.95)';
           ctx.strokeText('松手!', x, y - 64 * u);
           ctx.fillStyle = '#EF5350'; ctx.fillText('松手!', x, y - 64 * u);

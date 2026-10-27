@@ -49,9 +49,9 @@
   P.start = function (cfg) {
     this.cfg = cfg;
     this.chart = RF.chart.make(cfg);
-    /* 蓄力关：倒计时段（开局 + 每波前 3 秒） */
+    /* 蓄力关：倒计时段（每个“按住!”提示前 3 秒） */
     this._cdLast = 0;
-    this._cdSegs = (this.chart.waveStarts || []).map((t, i) => ({ a: i === 0 ? 0 : t - 3, b: i === 0 ? 3 : t, i }));
+    this._cdSegs = this.chart.cdSegs || [];
     this.song = RF.music.make({
       seed: U.hashStr(cfg.id + 'music'), bpm: cfg.bpm,
       bars: Math.max(1, Math.ceil(this.chart.duration / (4 * this.chart.beatSec))),
@@ -186,7 +186,7 @@
         ctx.font = '700 ' + 16 * u + 'px system-ui,sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'top';
         ctx.fillStyle = 'rgba(90,60,20,0.85)';
-        ctx.fillText(seg.i === 0 ? '准备… 黄圈出现时按住' : '第 ' + (seg.i + 1) + ' 波来袭…', w / 2, h * 0.42 + 62 * u);
+        ctx.fillText(seg.i === 0 ? '准备… 黄圈出现时按住' : '第 ' + (seg.i + 1) + ' 次蓄力…', w / 2, h * 0.42 + 62 * u);
       }
       if (this._cardT > 0) {
         const a = Math.min(1, this._cardT / 0.4);
