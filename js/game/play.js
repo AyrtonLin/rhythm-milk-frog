@@ -121,10 +121,10 @@
 
     const now = this.now();
     this._cardT = Math.max(0, this._cardT - dt);
-    /* 倒计时滴声（每波前 3 秒） */
+    /* 倒计时滴声（每音符前 1 秒快闪 3-2-1） */
     const seg = this.cdSegAt(now);
     if (seg) {
-      const c = Math.ceil(seg.b - now);
+      const c = Math.min(3, Math.ceil((seg.b - now) * 3));
       if (c !== this._cdLast) { this._cdLast = c; RF.sfx.count(false); }
     } else if (this._cdLast > 0) {
       this._cdLast = 0; RF.sfx.count(true);
@@ -168,8 +168,9 @@
       const seg = this.state === 'play' ? this.cdSegAt(this.now()) : null;
       if (this.cfg.mech === 'power' && seg) {
         const tn = this.now();
-        const num = Math.ceil(seg.b - tn);
-        const phase = 1 - ((seg.b - tn) - (num - 1));
+        const rem = seg.b - tn;
+        const num = Math.min(3, Math.ceil(rem * 3));
+        const phase = 1 - (rem * 3 - (num - 1));
         const sc = 1 + 0.6 * (1 - Math.min(1, phase * 2.5));
         ctx.save();
         ctx.translate(w / 2, h * 0.42);

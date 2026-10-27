@@ -20,10 +20,10 @@
     /* 以基础间隔铺点，再按种子做 ±0.5 拍微扰（保持网格对齐） */
     let base = Math.max(0.5, Math.round((usable / count) * 2) / 2);
     if (cfg.mech === 'power') {
-      /* 蓄力关：每个音符前都有 3 秒倒计时 → 音符间隔 ≥ 3.6s，时长适当放宽 */
+      /* 蓄力关：每音符前 1 秒倒计时(3-2-1快闪) → 间隔 2.1~3.0s，时长 ≈ 1 分钟 */
       const li = (cfg.levelIdx - 1) % 10;
-      count = [12, 12, 13, 13, 14, 14, 15, 15, 16, 16][li];
-      const gapSec = [4.5, 4.4, 4.3, 4.2, 4.1, 4.0, 3.9, 3.8, 3.7, 3.6][li];
+      count = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25][li];
+      const gapSec = [3.0, 2.9, 2.8, 2.7, 2.6, 2.5, 2.4, 2.3, 2.2, 2.1][li];
       base = Math.max(2, Math.round(gapSec / beatSec * 2) / 2);
     }
     let t = intro, i = 0;
@@ -37,10 +37,10 @@
       t = Math.round((t + Math.max(0.5, gap)) * 2) / 2;
       i++;
     }
-    /* 蓄力关：开局预留首个 3 秒倒计时 */
+    /* 蓄力关：开局预留首个 1 秒倒计时 */
     let cdSegs = null;
     if (cfg.mech === 'power') {
-      const baseOff = Math.max(0.5, (4.2 - intro * beatSec) / beatSec);
+      const baseOff = Math.max(0.5, (2.5 - intro * beatSec) / beatSec);
       notes.forEach(n => { n.beat += baseOff; n.t = n.beat * beatSec; });
       total = Math.ceil(notes[notes.length - 1].beat) + 4;
     }
@@ -48,10 +48,10 @@
     const zoneCenters = [35, 55, 72, 88];
     notes.forEach((n, k) => {
       if (cfg.mech === 'power') {
-        /* 目标力度所需按压时长必须 ≤ 间隔-3.6s（前面要放 3 秒倒计时） */
+        /* 目标力度所需按压时长必须 ≤ 间隔-1.8s（前面要放 1 秒倒计时+缓冲） */
         const prevB = k > 0 ? notes[k - 1].beat : 0;
         const avail = (n.beat - prevB) * beatSec;
-        const maxC = U.clamp(Math.min(avail / C.FULL * 100 * 0.85, (avail - 3.6) / C.FULL * 100), 30, 95);
+        const maxC = U.clamp(Math.min(avail / C.FULL * 100 * 0.85, (avail - 1.8) / C.FULL * 100), 30, 95);
         let c = zoneCenters[Math.floor(r() * zoneCenters.length)] + U.rr(r, -6, 6);
         c = Math.min(c, maxC);
         n.zone = { c: U.clamp(c, 20, 95), p: 10, g: 20 };   // 力度目标区间（P/G 半宽）
@@ -75,11 +75,11 @@
         n.item = Math.floor(r() * 8);
       }
     });
-    /* 蓄力关：每个音符的倒计时段（终点 = 该音符“按住!”出现时刻） */
+    /* 蓄力关：每个音符的倒计时段（1 秒快闪 3-2-1，终点 = “按住!”出现时刻） */
     if (cfg.mech === 'power') {
       cdSegs = notes.map((n, k) => {
         const cue = n.t - n.zone.c / 100 * C.FULL;
-        return { a: Math.max(0.2, cue - 3), b: cue, i: k };
+        return { a: Math.max(0.2, cue - 1), b: cue, i: k };
       });
     }
     /* 满分模拟：全 Perfect 连击加成 */

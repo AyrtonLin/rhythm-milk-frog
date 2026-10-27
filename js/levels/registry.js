@@ -1,6 +1,8 @@
 /* 节奏小奶蛙 - 关卡注册表与解锁链 */
 (function () {
   const R = RF.registry = {};
+  /* 开发期开关：true = 全部已构建关卡解锁便于测试；正式收尾时改 false */
+  R.DEV_UNLOCK = true;
   R.STAGES = [
     { n: 1, name: '运动季', icon: '🏀', desc: '运动场 · 明亮活力' },
     { n: 2, name: '生活家', icon: '🍳', desc: '温馨家居 · 暖色生活' },
@@ -14,10 +16,11 @@
   R.stageLevels = n => R.list().filter(l => l.stage === n).sort((a, b) => a.idx - b.idx);
   R.gi = cfg => (cfg.stage - 1) * 10 + cfg.idx;              // 全局序号 1..60
   R.stageUnlocked = n => {
-    if (n === 1) return true;
     const built = R.stageLevels(n).length > 0;
+    if (R.DEV_UNLOCK) return built;
+    if (n === 1) return true;
     return built && RF.save.get().unlocked > (n - 1) * 10;
   };
-  R.levelUnlocked = cfg => RF.save.get().unlocked >= R.gi(cfg);
+  R.levelUnlocked = cfg => R.DEV_UNLOCK || RF.save.get().unlocked >= R.gi(cfg);
   R.nextOf = cfg => R.list().find(l => l.stage === cfg.stage && l.idx === cfg.idx + 1);
 })();
