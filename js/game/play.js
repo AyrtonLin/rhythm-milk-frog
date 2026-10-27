@@ -80,6 +80,7 @@
       prop: cfg.params.prop || null, propHand: 'R', propAngle: 0
     };
     this.mech.init(this);
+    this._cin = null;
     this.active = true;
     /* 新机制轻量提示（首次出现一次） */
     const flags = RF.save.get().flags;
@@ -121,6 +122,18 @@
 
     const now = this.now();
     this._cardT = Math.max(0, this._cardT - dt);
+    /* 剧情片尾（6-3 推门 / 6-10 归家） */
+    if (this.cfg.params.ending && !this._cin && now > this.chart.duration - 0.15) {
+      this._cin = { t: 0 };
+      RF.audio.stop();
+      RF.ui.showPauseBtn(false);
+    }
+    if (this._cin) {
+      this._cin.t += dt;
+      RF.fx.update(dt);
+      if (this._cin.t > 11) this.finish();
+      return;
+    }
     /* 倒计时滴声（每音符前 1 秒快闪 3-2-1） */
     const seg = this.cdSegAt(now);
     if (seg) {
@@ -149,6 +162,11 @@
     ctx.save();
     if (RF.fx.shake > 0) ctx.translate(U.rr(Math.random, -1, 1) * RF.fx.shake, U.rr(Math.random, -1, 1) * RF.fx.shake);
     RF.themes.draw(this.cfg.stage, ctx, Math.max(0, this.now()), w, h);
+    if (this._cin) {
+      this.drawCinema(ctx);
+      ctx.restore();
+      return;
+    }
     if (this.state === 'tutorial') {
       RF.mech.drawFrog(this, ctx);
       RF.fx.draw(ctx);
@@ -215,7 +233,7 @@
 
   P.down = e => {
     if (P.state === 'tutorial') { RF.tutorial.down(P, e); return; }
-    if (P.state !== 'play') return;
+    if (P.state !== 'play' || P._cin) return;
     if (e.lane != null && P.cfg.mech !== 'keys') return;      // 轨道事件只给音游关
     if (e.dir != null && P.cfg.mech === 'keys') return;       // 方向事件不给音游关
     let ev = e;
@@ -228,6 +246,96 @@
     if (e.dir || RF.hud._dpadActive) RF.hud._dpadActive = null;
     if (P.state === 'tutorial') RF.tutorial.up(P, e);
     else if (P.state === 'play') P.mech.up(P, e);
+  };
+
+  /* ---------- 剧情片尾演出 ---------- */
+  P.drawCinema = function (ctx) {
+    const U = RF.util;
+    const w = RF.view.w, h = RF.view.h, u = RF.view.u, t = this._cin.t;
+    const kind = this.cfg.params.ending;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+    if (kind === 'door') {
+      const open = U.clamp(t / 2.5, 0, 1);
+      const dw = w * 0.34, dh = h * 0.5, dx = w / 2 - dw / 2, dy = h * 0.22;
+      const lg = ctx.createLinearGradient(0, dy, 0, dy + dh);
+      lg.addColorStop(0, 'rgba(255,236,150,' + (0.25 + open * 0.7).toFixed(2) + ')');
+      lg.addColorStop(1, 'rgba(255,183,77,' + (0.15 + open * 0.5).toFixed(2) + ')');
+      ctx.fillStyle = lg;
+      ctx.fillRect(dx, dy, dw, dh);
+      ctx.fillStyle = '#3E2723';
+      ctx.fillRect(dx - open * dw / 2, dy, dw / 2, dh);
+      ctx.fillRect(dx + dw / 2 + open * dw / 2, dy, dw / 2, dh);
+      if (t > 2.5) {
+        const labels = ['出生照', '家人合照', '同学合照', '同事合照'];
+        const idx = Math.min(3, Math.floor((t - 2.5) / 1.8));
+        const k = ((t - 2.5) % 1.8) / 1.8;
+        const cw = w * 0.42, chh = h * 0.3;
+        const cx = w * 0.5 + (0.5 - k) * w * 0.1;
+        ctx.save();
+        ctx.globalAlpha = U.clamp(Math.sin(Math.min(1, k) * Math.PI) * 1.4, 0.05, 1);
+        ctx.fillStyle = '#FFFDF4';
+        U.roundRect(ctx, cx - cw / 2, h * 0.3, cw, chh, 8 * u); ctx.fill();
+        ctx.strokeStyle = '#8D6E63'; ctx.lineWidth = 4 * u;
+        U.roundRect(ctx, cx - cw / 2, h * 0.3, cw, chh, 8 * u); ctx.stroke();
+        ctx.fillStyle = '#5D4037';
+        const cnt = idx + 1;
+        for (let i = 0; i < cnt; i++) {
+          const px = cx - (cnt - 1) * 14 * u + i * 28 * u;
+          const hh = idx === 0 && i === 0 ? 16 * u : 28 * u;
+          U.ell(ctx, px, h * 0.3 + chh * 0.66, 10 * u, hh * 0.6); ctx.fill();
+          U.circle(ctx, px, h * 0.3 + chh * 0.66 - hh, 8 * u); ctx.fill();
+        }
+        ctx.fillStyle = '#6b4a12'; ctx.font = '800 ' + 16 * u + 'px system-ui,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(labels[idx], cx, h * 0.3 + chh - 16 * u);
+        ctx.restore();
+      }
+      if (t > 9.4) {
+        ctx.fillStyle = 'rgba(0,0,0,' + U.clamp((t - 9.4) / 1.2, 0, 1).toFixed(2) + ')';
+        ctx.fillRect(0, 0, w, h);
+        ctx.globalAlpha = U.clamp((t - 9.8) / 0.8, 0, 1);
+        ctx.fillStyle = '#FFF6D8'; ctx.font = '900 ' + 30 * u + 'px system-ui,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('感谢游玩', w / 2, h * 0.46);
+        ctx.font = '600 ' + 14 * u + 'px system-ui,sans-serif';
+        ctx.fillText('节奏小奶蛙 · 人生的每一拍都值得铭记', w / 2, h * 0.53);
+        ctx.globalAlpha = 1;
+      }
+    } else {
+      const cols = [['#C8E6C9', '#66BB6A'], ['#B3E5FC', '#4FC3F7'], ['#FFE0B2', '#FB8C00'], ['#ECEFF1', '#90A4AE']];
+      const si = Math.min(3, Math.floor(t / 1.6));
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, cols[si][0]); g.addColorStop(1, cols[si][1]);
+      ctx.globalAlpha = 0.92; ctx.fillStyle = g; ctx.fillRect(0, 0, w, h); ctx.globalAlpha = 1;
+      ctx.fillStyle = 'rgba(62,39,35,0.85)';
+      ctx.fillRect(0, h * 0.72, w, h * 0.28);
+      ctx.strokeStyle = 'rgba(62,39,35,0.9)'; ctx.lineWidth = 6 * u;
+      ctx.beginPath(); ctx.moveTo(w * 0.78, h * 0.72); ctx.lineTo(w * 0.78, h * 0.4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(w * 0.78, h * 0.44); ctx.lineTo(w * 0.66, h * 0.44); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(w * 0.66, h * 0.44, 14 * u, 5 * u, 0, 0, U.TAU); ctx.stroke();
+      if (t > 6.4) {
+        ctx.fillStyle = 'rgba(62,39,35,0.95)';
+        U.ell(ctx, w * 0.4, h * 0.66, 16 * u, 22 * u); ctx.fill();
+        U.circle(ctx, w * 0.4, h * 0.66 - 26 * u, 12 * u); ctx.fill();
+        U.ell(ctx, w * 0.55, h * 0.68, 12 * u, 16 * u); ctx.fill();
+        U.circle(ctx, w * 0.55, h * 0.68 - 20 * u, 9 * u); ctx.fill();
+        ctx.strokeStyle = 'rgba(62,39,35,0.95)'; ctx.lineWidth = 5 * u; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(w * 0.4 + 12 * u, h * 0.66 - 10 * u);
+        ctx.lineTo(w * 0.4 + 26 * u, h * 0.66 - 30 * u - Math.sin(t * 6) * 4 * u); ctx.stroke();
+      }
+      if (t > 8.6) {
+        ctx.fillStyle = 'rgba(255,255,255,' + U.clamp((t - 8.6) / 0.4, 0, 1).toFixed(2) + ')';
+        ctx.fillRect(0, 0, w, h);
+      }
+      if (t > 9.2) {
+        ctx.fillStyle = '#5D4037'; ctx.font = '900 ' + 28 * u + 'px system-ui,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('感谢游玩 · 节奏小奶蛙', w / 2, h * 0.46);
+        ctx.font = '600 ' + 14 * u + 'px system-ui,sans-serif';
+        ctx.fillText('下一个节拍，再见', w / 2, h * 0.53);
+      }
+    }
   };
 
   P.pause = function () {
