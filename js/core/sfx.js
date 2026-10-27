@@ -19,6 +19,12 @@
   S.shatter = () => { N({ dur: 0.3, vol: 0.3, freq: 4000, filter: 'highpass' }); T({ f: 1200, f2: 300, dur: 0.2, vol: 0.12, type: 'triangle' }); };
   S.score = () => { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => T({ f, dur: 0.18, vol: 0.24, type: 'triangle' }), i * 90)); };
   S.fail = () => { [330, 262, 196].forEach((f, i) => setTimeout(() => T({ f, dur: 0.25, vol: 0.24, type: 'triangle' }), i * 140)); };
+  S.ting = () => { T({ f: 2093, dur: 0.35, vol: 0.22, type: 'sine' }); T({ f: 3150, dur: 0.22, vol: 0.08, type: 'sine' }); };
+  S.key = i => {
+    const deg = [0, 2, 4, 7, 9, 12, 14, 16][i % 8];
+    T({ f: 523.25 * Math.pow(2, deg / 12), dur: 0.28, vol: 0.26, type: 'triangle' });
+    T({ f: 523.25 * Math.pow(2, deg / 12) * 2, dur: 0.18, vol: 0.1, type: 'sine' });
+  };
   S.count = hi => T({ f: hi ? 1560 : 900, dur: hi ? 0.2 : 0.09, vol: 0.3, type: 'square' });
   S.dart = () => { N({ dur: 0.08, vol: 0.24, freq: 2400, q: 1.6 }); T({ f: 900, f2: 300, dur: 0.1, vol: 0.16, type: 'square' }); };
   S.shot = () => { N({ dur: 0.09, vol: 0.34, freq: 1500, q: 0.7 }); T({ f: 220, f2: 90, dur: 0.12, vol: 0.3, type: 'sine' }); };
