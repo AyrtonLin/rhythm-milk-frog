@@ -216,12 +216,15 @@
   P.down = e => {
     if (P.state === 'tutorial') { RF.tutorial.down(P, e); return; }
     if (P.state !== 'play') return;
+    if (e.lane != null && P.cfg.mech !== 'keys') return;      // 轨道事件只给音游关
+    if (e.dir != null && P.cfg.mech === 'keys') return;       // 方向事件不给音游关
     let ev = e;
     const d = e.dir || (P.cfg.params.dpad ? RF.hud.dpadDir(e.x, e.y) : null);
     if (d) { ev = Object.assign({}, e, { dir: d }); RF.hud._dpadActive = d; }
     P.mech.down(P, ev);
   };
   P.up = e => {
+    if (e.lane != null && P.cfg.mech !== 'keys') return;
     if (e.dir || RF.hud._dpadActive) RF.hud._dpadActive = null;
     if (P.state === 'tutorial') RF.tutorial.up(P, e);
     else if (P.state === 'play') P.mech.up(P, e);

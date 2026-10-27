@@ -16,6 +16,7 @@
     const intro = 4, outro = 4;
     const usable = total - intro - outro;
     let count = Math.min(COUNTS[(cfg.levelIdx - 1) % 10] || 30, Math.floor(usable / 0.5));
+    if (cfg.params && cfg.params.dense) count = Math.round(count * 1.35);   // 高密度关（三角铁等）
     const notes = [];
     /* 以基础间隔铺点，再按种子做 ±0.5 拍微扰（保持网格对齐） */
     let base = Math.max(0.5, Math.round((usable / count) * 2) / 2);
@@ -73,6 +74,10 @@
         n.lane = Math.floor(r() * 3);
       } else if (cfg.mech === 'choice') {
         n.item = Math.floor(r() * 8);
+      } else if (cfg.mech === 'keys') {
+        n.lane = Math.floor(r() * (cfg.params.lanes || 4));
+      } else if (cfg.mech === 'tri') {
+        n.item = Math.floor(r() * 3);
       }
     });
     /* 蓄力关：每个音符的倒计时段（1 秒快闪 3-2-1，终点 = “按住!”出现时刻） */
