@@ -14,5 +14,5 @@
   L(7, '思念', 84, 'target', { kind: 'boat' }, { tip: '踩拍护航纸船，躲开暗礁' });
   L(8, '风暴', 88, 'beattap', { kind: 'cloud' }, { tip: '踩拍点击驱散乌云，等天晴' });
   L(9, '星河', 92, 'power', { kind: 'star' }, { tip: '按住蓄力，踩拍让星光升上目标高度' });
-  L(10, '归家', 96, 'race', { kind: 'walk', dpad: true, judgeScale: 1.5, ending: 'home' }, { tip: '走过四季，踩拍按方向走向家' });
+  L(10, '归家', 96, 'race', { kind: 'walk', dpad: true, judgeScale: 1.5, sparse: 0.5, autoWin: true, ending: 'home' }, { tip: '走过四季，踩拍按方向走向家' });
 })();
