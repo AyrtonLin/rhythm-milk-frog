@@ -1,8 +1,8 @@
 /* 节奏小奶蛙 - 判定系统（全关卡统一复用）
-   时间窗：Perfect ±80ms / Good ±160ms / 其余 Miss
+   时间窗：Perfect ±120ms / Good ±240ms / 其余 Miss
    长按关双档：节奏档(按下/松手时刻) + 力度档(力度vs目标区间)，取较差者 */
 (function () {
-  const J = RF.judge = { P: 0.08, G: 0.16 };
+  const J = RF.judge = { P: 0.12, G: 0.24 };
   J.RANK = { P: 3, G: 2, M: 1 };
   J.timeTier = function (dt, s) {
     s = s || 1;
