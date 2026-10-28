@@ -39,18 +39,31 @@
   window.addEventListener('pointercancel', ev => release(ev, true));
   window.addEventListener('contextmenu', ev => { if (isCanvas(ev)) ev.preventDefault(); });
 
-  /* 键盘：空格/回车 = 点击与长按；W A S D / 方向键 = 上下左右（方向类关卡通用）；A S D F G H J K = 音游轨道 */
+  /* 键盘：空格/回车 = 点击与长按；W A S D / 方向键 = 上下左右（方向类关卡通用）；A S D F G H J K = 音游轨道
+     兼容中文输入法：ev.code 与 ev.key 双通道匹配（IME 开启时 code 可能为空/Process） */
   const DIRK = { KeyW: 'U', ArrowUp: 'U', KeyS: 'D', ArrowDown: 'D', KeyA: 'L', ArrowLeft: 'L', KeyD: 'R', ArrowRight: 'R' };
   const LANEK = { KeyA: 0, KeyS: 1, KeyD: 2, KeyF: 3, KeyG: 4, KeyH: 5, KeyJ: 6, KeyK: 7 };
+  const DIRW = { w: 'U', s: 'D', a: 'L', d: 'R' };
+  const LANEW = { a: 0, s: 1, d: 2, f: 3, g: 4, h: 5, j: 6, k: 7 };
+  function dirOf(ev) { return DIRK[ev.code] || (ev.key && DIRW[ev.key.toLowerCase()]) || (ev.key && DIRK[ev.key]) || null; }
+  function laneOf(ev) {
+    if (LANEK[ev.code] != null) return LANEK[ev.code];
+    if (ev.key) {
+      const l = ev.key.toLowerCase();
+      if (LANEW[l] != null) return LANEW[l];
+      if (LANEK[ev.key] != null) return LANEK[ev.key];
+    }
+    return null;
+  }
   let kbT = 0;
   window.addEventListener('keydown', ev => {
-    const ln = LANEK[ev.code];
+    const ln = laneOf(ev);
     if (ln != null) {
       if (!ev.repeat) emit({ type: 'down', id: 'kl' + ln, lane: ln, x: RF.view.w / 2, y: RF.view.h / 2 });
-      if (ev.code !== 'KeyA' && ev.code !== 'KeyS' && ev.code !== 'KeyD') return;  // 与 WASD 共存时继续发方向
+      if (!/^Key[ASD]$/.test(ev.code || '') && !/^(a|s|d)$/i.test(ev.key || '')) return;  // 非轨道+WASD 共享键只发轨道
       if (ev.repeat) return;
     }
-    const d = DIRK[ev.code];
+    const d = dirOf(ev);
     if (d) {
       ev.preventDefault();
       if (ev.repeat) return;
@@ -64,12 +77,12 @@
     }
   });
   window.addEventListener('keyup', ev => {
-    const ln = LANEK[ev.code];
+    const ln = laneOf(ev);
     if (ln != null) {
       emit({ type: 'up', id: 'kl' + ln, lane: ln, x: RF.view.w / 2, y: RF.view.h / 2, hold: 0 });
-      if (ev.code !== 'KeyA' && ev.code !== 'KeyS' && ev.code !== 'KeyD') return;
+      if (!/^Key[ASD]$/.test(ev.code || '') && !/^(a|s|d)$/i.test(ev.key || '')) return;
     }
-    const d = DIRK[ev.code];
+    const d = dirOf(ev);
     if (d) {
       emit({ type: 'up', id: 'kb_' + d, dir: d, x: RF.view.w / 2, y: RF.view.h / 2, hold: 0 });
       return;
