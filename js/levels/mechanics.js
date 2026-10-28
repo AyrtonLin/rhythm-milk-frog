@@ -413,8 +413,11 @@
       if (now > r.chart.duration - 0.6 && !m.finished) { m.finished = true; RF.sfx.whistle(); RF.fx.confetti(w / 2, RF.view.h * 0.4, 24); }
     },
     down(r, e) {
-      const m = r.m, now = r.now();
+      const m = r.m, now = r.now(), w = RF.view.w;
       const side = e.dir || (e.x < RF.view.w / 2 ? 'L' : 'R');
+      /* 只接受本关谱面真实使用的方向；未使用方向的按键（如纯左右关按 W/S）不判定 */
+      if (!m.dirs) { m.dirs = new Set(); for (const nn of r.chart.notes) m.dirs.add(nn.dir); }
+      if (!m.dirs.has(side)) return;
       const note = r.pending(r.winG);
       if (!note) { if (side === 'L' || side === 'R') m.tilt += (side === 'L' ? -0.12 : 0.12); return; }
       const correct = note.dir === side;
