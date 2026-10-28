@@ -14,5 +14,5 @@
   L(7, '开闸放水', 136, 'target', { kind: 'gate' }, { tip: '闸门喷水时踩拍点击关闸' });
   L(8, '接电话', 140, 'target', { kind: 'phone' }, { tip: '电话响起时踩拍点击接听' });
   L(9, '准时下班', 144, 'beattap', { kind: 'boss' }, { tip: '主管回头时踩拍点击隐蔽' });
-  L(10, '赶公交', 148, 'race', { kind: 'run', dpad: true, judgeScale: 1.5 }, { tip: '踩拍按方向键冲刺赶车（WASD/屏幕方向键）' });
+  L(10, '赶公交', 148, 'race', { kind: 'run', dpad: true, judgeScale: 1.5, sparse: 0.5, autoWin: true }, { tip: '踩拍按方向键冲刺赶车（WASD/屏幕方向键）' });
 })();
