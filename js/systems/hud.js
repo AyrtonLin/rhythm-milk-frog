@@ -118,7 +118,16 @@
     ctx.fillStyle = 'rgba(90,60,20,0.55)';
     ctx.font = '600 ' + (11 * u) + 'px system-ui,sans-serif';
     ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.fillText('键盘 W/A/S/D 或点按方向键', RF.view.margin() + 132 * u, RF.view.h - RF.view.margin() - 34 * u);
+    /* 按各关谱面实际用到的方向提示对应键位 */
+    let hint = '键盘 W/A/S/D 或点按方向键';
+    try {
+      const ds = new Set(RF.play && RF.play.chart ? RF.play.chart.notes.map(nn => nn.dir) : []);
+      const hasL = ds.has('L'), hasR = ds.has('R'), hasU = ds.has('U'), hasD = ds.has('D');
+      if (hasL && hasR && !hasU && !hasD) hint = '键盘 A=左 D=右 或点按方向键';
+      else if (!hasL && !hasR && hasU && hasD) hint = '键盘 W=上 S=下 或点按方向键';
+      else if (hasL && hasR && (hasU || hasD)) hint = '键盘 W/A/S/D（上左下右）或点按方向键';
+    } catch (err) { /* 保底默认提示 */ }
+    ctx.fillText(hint, RF.view.margin() + 132 * u, RF.view.h - RF.view.margin() - 34 * u);
   };
 
   /* ---------- 节拍视觉提示：每拍脉冲环 + 下一音符逼近环（踩拍更明显） ---------- */
