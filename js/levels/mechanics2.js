@@ -588,9 +588,13 @@
     SCEN: [['电话铃', '📞', 0], ['闹钟响', '⏰', 1], ['消息弹窗', '💬', 2]],
     BTNS: [['接电话', '#66BB6A'], ['关闹钟', '#42A5F5'], ['稍后读', '#FFB300']],
     answer(n) { return n.item % 3; },
-    init(r) { r.m = { fb: -1, ft: -9 }; r.frog.prop = null; },
+    init(r) {
+      r.m = { fb: -1, ft: -9 }; r.frog.prop = null;
+      const w = RF.view.w;
+      r.frog.x = w * 0.155; r.frog.face = 1;   // 坐到会议桌左端，不挡任何按键
+    },
     btnX(i) { return RF.view.w * (0.3 + 0.2 * i); },
-    update(r, dt) { r.cueX = RF.view.w / 2; r.cueY = RF.view.h * 0.3; },
+    update(r, dt) { r.cueX = RF.view.w / 2; r.cueY = RF.view.h * 0.37; },
     down(r, e) {
       const now = r.now(), u = RF.view.u;
       const note = r.pending(r.winG);
