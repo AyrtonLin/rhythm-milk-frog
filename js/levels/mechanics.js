@@ -414,7 +414,9 @@
     },
     down(r, e) {
       const m = r.m, now = r.now(), w = RF.view.w;
-      const side = e.dir || (e.x < RF.view.w / 2 ? 'L' : 'R');
+      /* 键盘关只用键盘/屏幕方向键：无方向事件（如半屏点击）不参与判定 */
+      if (!e.dir) return;
+      const side = e.dir;
       /* 只接受本关谱面真实使用的方向；未使用方向的按键（如纯左右关按 W/S）不判定 */
       if (!m.dirs) { m.dirs = new Set(); for (const nn of r.chart.notes) m.dirs.add(nn.dir); }
       if (!m.dirs.has(side)) return;
