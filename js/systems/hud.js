@@ -138,6 +138,7 @@
     if (!n) return;
     let win = b * 2;
     if (r.cfg && r.cfg.params && r.cfg.params.cueWinBeats) win = b * r.cfg.params.cueWinBeats;  // 关卡自定义缩圈时长
+    if (r.cfg && r.cfg.params && r.cfg.params.autoWin && r.chart.gapBeats) win = b * r.chart.gapBeats;  // 缩圈=音符间隔：每拍完整慢缩圈
     if (r.cfg && r.cfg.mech === 'power' && n.zone) {
       win = Math.max(0.3, n.zone.c / 100 * RF.chart.FULL);
     }

@@ -17,6 +17,7 @@
     const usable = total - intro - outro;
     let count = Math.min(COUNTS[(cfg.levelIdx - 1) % 10] || 30, Math.floor(usable / 0.5));
     if (cfg.params && cfg.params.dense) count = Math.round(count * 1.35);   // 高密度关（三角铁等）
+    if (cfg.params && cfg.params.sparse) count = Math.max(8, Math.round(count * cfg.params.sparse));  // 低频率关（延长单环缩圈）
     const notes = [];
     /* 以基础间隔铺点，再按种子做 ±0.5 拍微扰（保持网格对齐） */
     let base = Math.max(0.5, Math.round((usable / count) * 2) / 2);
@@ -31,7 +32,7 @@
     while (t <= total - outro && i < count + (cfg.mech === 'power' ? 1 : 6)) {
       notes.push({ i: i, beat: t, t: t * beatSec, judged: false, tier: null });
       let gap = base;
-      const roll = r();
+      const roll = (cfg.params && cfg.params.sparse) ? 0.5 : r();   // 稀疏关取消微扰，间隔恒定=缩圈窗口
       if (base >= 1.5 && roll < 0.25) gap = base - 0.5;
       else if (base >= 1 && roll > 0.82) gap = base - 0.5;
       else if (base <= 1.5 && roll > 0.9) gap = base + 0.5;
@@ -95,7 +96,7 @@
     notes.forEach(() => { combo++; maxScore += 300 * C.comboMult(combo); });
     return {
       notes, beatSec, duration: total * beatSec, totalBeats: total, maxScore,
-      count: notes.length, cdSegs
+      count: notes.length, cdSegs, gapBeats: base
     };
   };
   C.comboMult = combo => 1 + Math.min(0.5, Math.floor(combo / 10) * 0.05);
