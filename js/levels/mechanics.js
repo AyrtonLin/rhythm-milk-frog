@@ -497,7 +497,7 @@
         ctx.fillStyle = 'rgba(255,211,77,0.95)';
         RF.util.roundRect(ctx, -22 * u, -16 * u, 44 * u, 32 * u, 8 * u); ctx.fill();
         ctx.save();
-        ctx.rotate({ R: Math.PI / 2, U: 0, D: Math.PI, L: -Math.PI / 2 }[n.dir] || 0);
+        ctx.rotate({ U: -Math.PI / 2, D: Math.PI / 2, L: Math.PI, R: 0 }[n.dir] || 0);
         ctx.fillStyle = '#8a5a2b';
         ctx.beginPath(); ctx.moveTo(11 * u, 0); ctx.lineTo(-8 * u, -9 * u); ctx.lineTo(-8 * u, 9 * u); ctx.closePath(); ctx.fill();
         ctx.restore();
