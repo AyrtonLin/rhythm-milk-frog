@@ -418,7 +418,13 @@
       /* 只接受本关谱面真实使用的方向；未使用方向的按键（如纯左右关按 W/S）不判定 */
       if (!m.dirs) { m.dirs = new Set(); for (const nn of r.chart.notes) m.dirs.add(nn.dir); }
       if (!m.dirs.has(side)) return;
-      const note = r.pending(r.winG);
+      /* 先按"方向匹配"找音豆：按 L 只可能判给 L 音豆，不会被时间更近的其他方向音豆抢走 */
+      let note = null, bd = 1e9;
+      for (const nn of r.chart.notes) {
+        if (nn.judged || nn.dir !== side) continue;
+        const d = Math.abs(nn.t - now);
+        if (d <= r.winG && d < bd) { bd = d; note = nn; }
+      }
       if (!note) { if (side === 'L' || side === 'R') m.tilt += (side === 'L' ? -0.12 : 0.12); return; }
       const correct = note.dir === side;
       const tier = J.timeTier(now - note.t, r.winS);
