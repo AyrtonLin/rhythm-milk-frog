@@ -7,7 +7,12 @@
     const dt = Math.min(0.05, (ts - last) / 1000 || 0.016);
     last = ts;
     const ctx = RF.view.ctx;
-    ctx.clearRect(0, 0, RF.view.w, RF.view.h);
+    /* 清空整块物理画布（无视基础变换）：否则 Miss 震屏时场景溢出到逻辑区外的
+       字框边带无法被清除，残影逐帧累积 */
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.restore();
     if (RF.play.active) {
       if (RF.play.state !== 'paused') RF.play.update(dt);
       RF.play.draw(ctx);

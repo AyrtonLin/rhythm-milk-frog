@@ -1,6 +1,7 @@
 /* 节奏小奶蛙 - 第五/六阶段场景画家 + 拍照姿势机制 + 关卡场景注册表 RF.scenes */
 (function () {
   const U = RF.util;
+  const M = RF.mech;
   const S = RF.scenes = {};
 
   /* ---------- 第五阶段 ---------- */
