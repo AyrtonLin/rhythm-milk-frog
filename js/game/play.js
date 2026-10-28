@@ -58,7 +58,11 @@
       style: cfg.style, voice: cfg.params.voice, accents: this.chart.notes.map(n => n.beat)
     });
     this.scoreState = RF.scoring.create(this.chart.maxScore);
-    this.winS = cfg.params.judgeScale || 1;      // 判定窗口倍率（赛车等关放宽）
+    /* 难度曲线：阶段系数（1→6 递减 1.3→0.9） × 关内微收（每关 -1.5%） × 机制无障碍倍率（race 键盘关等）
+       音符密度 COUNTS 本就随关递增；判定窗随之从宽到严，确保由易到难 */
+    const SDF = { 1: 1.3, 2: 1.2, 3: 1.1, 4: 1.02, 5: 0.95, 6: 0.9 };
+    const fIdx = 1 - (cfg.idx - 1) * 0.015;
+    this.winS = U.clamp((cfg.params.judgeScale || 1) * (SDF[cfg.stage] || 1) * fIdx, 0.7, 2.0);
     this.winG = J.G * this.winS;
     this.mech = RF.mech[cfg.mech];
     this.m = null; this.tut = null;
