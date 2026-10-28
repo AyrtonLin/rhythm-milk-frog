@@ -60,9 +60,9 @@
     this.scoreState = RF.scoring.create(this.chart.maxScore);
     /* 难度曲线：阶段系数（1→6 递减 1.3→0.9） × 关内微收（每关 -1.5%） × 机制无障碍倍率（race 键盘关等）
        音符密度 COUNTS 本就随关递增；判定窗随之从宽到严，确保由易到难 */
-    const SDF = { 1: 1.3, 2: 1.2, 3: 1.1, 4: 0.94, 5: 0.84, 6: 0.75 };
+    const SDF = { 1: 1.3, 2: 1.2, 3: 1.1, 4: 0.94, 5: 0.74, 6: 0.62 };
     const fIdx = 1 - (cfg.idx - 1) * 0.015;
-    this.winS = U.clamp((cfg.params.judgeScale || 1) * (SDF[cfg.stage] || 1) * fIdx, 0.7, 2.0);
+    this.winS = U.clamp((cfg.params.judgeScale || 1) * (SDF[cfg.stage] || 1) * fIdx, 0.6, 2.0);
     this.winG = J.G * this.winS;
     this.mech = RF.mech[cfg.mech];
     this.m = null; this.tut = null;
