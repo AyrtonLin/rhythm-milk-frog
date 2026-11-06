@@ -2,7 +2,7 @@
 (function () {
   const R = RF.registry = {};
   /* 开发期开关：true = 全部已构建关卡解锁便于测试；正式版 = false（按解锁链逐关解锁） */
-  R.DEV_UNLOCK = false;
+  R.DEV_UNLOCK = true;
   R.STAGES = [
     { n: 1, name: '运动季', icon: '🏀', desc: '运动场 · 明亮活力' },
     { n: 2, name: '生活家', icon: '🍳', desc: '温馨家居 · 暖色生活' },
